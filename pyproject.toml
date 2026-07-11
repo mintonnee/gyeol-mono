@@ -1,0 +1,36 @@
+[build-system]
+requires = ["uv_build>=0.11.0,<0.12.0"]
+build-backend = "uv_build"
+
+[project]
+name = "gyeol-mono"
+version = "0.1.0"
+description = "Reproducible build tooling for the Gyeol Mono typeface"
+requires-python = ">=3.12"
+dependencies = [
+    "fonttools[woff]>=4.63.0,<5",
+]
+
+[project.scripts]
+gyeol-mono = "gyeol_mono.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.0,<10",
+    "ruff>=0.15.0,<1",
+]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["B", "C4", "E", "F", "I", "RUF", "SIM", "UP"]
+
+[tool.uv.build-backend]
+module-name = "gyeol_mono"
+module-root = "src"

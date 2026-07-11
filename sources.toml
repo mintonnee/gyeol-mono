@@ -1,0 +1,60 @@
+schema_version = 1
+
+[[source]]
+id = "ibm-plex-mono"
+role = "latin-base"
+version = "2.5.0"
+release_page = "https://github.com/IBM/plex/releases/tag/%40ibm%2Fplex-mono%402.5.0"
+url = "https://github.com/IBM/plex/releases/download/%40ibm/plex-mono%402.5.0/ibm-plex-mono.zip"
+archive = "ibm-plex-mono-2.5.0.zip"
+sha256 = "6d23f01257663d8cc49a0d64c22ced630b79e0e2a0ac08a0da86e9a38bbc481c"
+files = [
+    "ibm-plex-mono/LICENSE.txt",
+    "ibm-plex-mono/fonts/complete/ttf/IBMPlexMono-Regular.ttf",
+    "ibm-plex-mono/fonts/complete/ttf/IBMPlexMono-Italic.ttf",
+    "ibm-plex-mono/fonts/complete/ttf/IBMPlexMono-SemiBold.ttf",
+    "ibm-plex-mono/fonts/complete/ttf/IBMPlexMono-SemiBoldItalic.ttf",
+]
+
+[[source]]
+id = "maru-buri"
+role = "hangul"
+version = "2022-final"
+release_page = "https://hangeul.naver.com/font"
+url = "https://campaign-cdn.pstatic.net/0/hangeul/2022/zip_v2/maruburi.zip"
+archive = "maru-buri-2022-final.zip"
+sha256 = "39e3bb6a00b4543563a745195a6a89282c5a1f0f8b71923ff15c1bc7c135fa0c"
+license_url = "https://help.naver.com/service/30016/contents/18088?osType=PC&lang=ko"
+files = [
+    "TTF/MaruBuri-Regular.ttf",
+    "TTF/MaruBuri-SemiBold.ttf",
+]
+
+[[source]]
+id = "klee-one"
+role = "japanese-candidate-a"
+version = "Version1.000"
+revision = "8b0532731b63ad8a445ca341d8d7d941079b83ab"
+release_page = "https://github.com/fontworks-fonts/Klee/releases/tag/Version1.000"
+url = "https://codeload.github.com/fontworks-fonts/Klee/zip/8b0532731b63ad8a445ca341d8d7d941079b83ab"
+archive = "klee-one-Version1.000-8b053273.zip"
+sha256 = "4ca4e5d364fa28a8035e0041d94feb745b4104cfda828d42b5d0d8f13bae83c7"
+files = [
+    "Klee-8b0532731b63ad8a445ca341d8d7d941079b83ab/OFL.txt",
+    "Klee-8b0532731b63ad8a445ca341d8d7d941079b83ab/fonts/ttf/KleeOne-Regular.ttf",
+    "Klee-8b0532731b63ad8a445ca341d8d7d941079b83ab/fonts/ttf/KleeOne-SemiBold.ttf",
+]
+
+[[source]]
+id = "ibm-plex-sans-jp"
+role = "japanese-candidate-b"
+version = "3.0.0"
+release_page = "https://github.com/IBM/plex/releases/tag/%40ibm%2Fplex-sans-jp%403.0.0"
+url = "https://github.com/IBM/plex/releases/download/%40ibm/plex-sans-jp%403.0.0/ibm-plex-sans-jp.zip"
+archive = "ibm-plex-sans-jp-3.0.0.zip"
+sha256 = "4c14c41552934b0bc92fc216a76b36bdc78f745dfbeed1115f9b8bc405ee314f"
+files = [
+    "ibm-plex-sans-jp/LICENSE.txt",
+    "ibm-plex-sans-jp/fonts/complete/ttf/unhinted/IBMPlexSansJP-Regular.ttf",
+    "ibm-plex-sans-jp/fonts/complete/ttf/unhinted/IBMPlexSansJP-SemiBold.ttf",
+]

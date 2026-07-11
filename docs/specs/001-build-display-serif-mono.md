@@ -42,17 +42,21 @@
 
 ## 4. 원본과 버전 고정
 
-빌드는 다음 원본을 사용한다.
+빌드는 다음 배포처와 버전을 canonical upstream으로 사용한다. 다운로드 URL과 실제 파일 경로는 저장소 루트의 `sources.toml`을 단일 진실 공급원으로 삼는다.
 
-| 역할 | 원본 | 형식 |
-| --- | --- | --- |
-| 라틴 및 기본 OpenType 테이블 | IBM Plex Mono | 정적 TTF |
-| 한글 및 한글 전각 문장부호 | 마루 부리 | 정적 TTF |
-| 일본어 후보 A | Klee One | 정적 TTF |
-| 일본어 후보 B | IBM Plex Sans JP | 정적 TTF |
-| Powerline 글리프 | Nerd Fonts Font Patcher에 포함된 Powerline/Powerline Extra | Font Patcher 입력 자산 |
+| 역할 | 원본 및 버전 | 배포 자산 | SHA-256 |
+| --- | --- | --- | --- |
+| 라틴 및 기본 OpenType 테이블 | [IBM Plex Mono 2.5.0](https://github.com/IBM/plex/releases/tag/%40ibm%2Fplex-mono%402.5.0) | `ibm-plex-mono.zip` | `6d23f01257663d8cc49a0d64c22ced630b79e0e2a0ac08a0da86e9a38bbc481c` |
+| 한글 및 한글 전각 문장부호 | [마루 부리 2022 완성본](https://hangeul.naver.com/font) | `maruburi.zip` | `39e3bb6a00b4543563a745195a6a89282c5a1f0f8b71923ff15c1bc7c135fa0c` |
+| 일본어 후보 A | [Klee One Version1.000](https://github.com/fontworks-fonts/Klee/releases/tag/Version1.000) | commit `8b0532731b63ad8a445ca341d8d7d941079b83ab` ZIP | `4ca4e5d364fa28a8035e0041d94feb745b4104cfda828d42b5d0d8f13bae83c7` |
+| 일본어 후보 B | [IBM Plex Sans JP 3.0.0](https://github.com/IBM/plex/releases/tag/%40ibm%2Fplex-sans-jp%403.0.0) | `ibm-plex-sans-jp.zip` | `4c14c41552934b0bc92fc216a76b36bdc78f745dfbeed1115f9b8bc405ee314f` |
+| Powerline 글리프 | Nerd Fonts Font Patcher에 포함된 Powerline/Powerline Extra | Font Patcher 입력 자산 | Nerd Fonts 버전 결정 후 추가 |
 
-다운로더는 원본별 버전, URL 및 SHA-256을 명시적으로 고정해야 한다. `latest` URL을 빌드 입력으로 직접 사용하면 안 된다. 원본 파일과 생성 파일은 Git에서 제외하고, 버전 및 체크섬 manifest만 추적한다.
+IBM Plex Mono에서는 complete TTF의 Regular, Italic, SemiBold, SemiBold Italic을 사용한다. IBM Plex Sans JP에서는 outline 변환 후 무효가 되는 힌팅을 가져오지 않도록 unhinted complete TTF의 Regular와 SemiBold를 사용한다. 마루 부리와 Klee One에서도 Regular와 SemiBold TTF만 추출한다.
+
+Klee의 `Version1.000`은 별도 GitHub Release asset이 아니라 태그이므로 태그가 가리키는 commit `8b0532731b63ad8a445ca341d8d7d941079b83ab`의 codeload ZIP을 고정한다. 마루 부리 ZIP에는 라이선스 파일이 포함되어 있지 않으므로 배포 패키지를 만들 때 [네이버 라이선스 전문](https://help.naver.com/service/30016/contents/18088?osType=PC&lang=ko)을 별도로 포함한다.
+
+다운로더는 `sources.toml`의 URL 및 SHA-256을 검증하고 선언된 파일만 `upstream/` 아래에 추출한다. `latest` URL을 빌드 입력으로 직접 사용하면 안 된다. 원본 파일과 생성 파일은 Git에서 제외하고 manifest만 추적한다.
 
 참고 자료:
 
@@ -326,6 +330,7 @@ NFD 입력을 지원하기 위해 현대 한글 자모 시퀀스를 완성형 �
 ```text
 docs/specs/
 scripts/download_upstream.py
+sources.toml
 src/<package>/builder.py
 src/<package>/metrics.py
 src/<package>/naming.py

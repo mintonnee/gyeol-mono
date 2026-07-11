@@ -7,7 +7,7 @@
 
 ## 1. 개요
 
-이 문서는 IBM Plex Mono의 라틴 글리프, 마루 부리의 한글 글리프와 일본어 후보 글꼴의 가나·한자 글리프를 결합한 `Gyeol Mono`를 만드는 데 필요한 설계와 빌드 규칙을 정의한다.
+이 문서는 IBM Plex Mono의 라틴 글리프, 마루 부리의 한글 글리프와 IBM Plex Sans JP의 가나·한자 글리프를 결합한 `Gyeol Mono`를 만드는 데 필요한 설계와 빌드 규칙을 정의한다.
 
 결과 글꼴은 라틴 문자에 600 units, 한글·가나·한자에 1,200 units의 advance를 사용하는 2폭 구조다. 따라서 엄밀히는 모든 글리프가 동일한 폭을 갖는 monospace가 아니라, 라틴 1셀과 CJK 2셀로 구성된 duospace 글꼴이다. 사용자에게는 일반적인 CJK 코딩 글꼴과 동일하게 모노스페이스 패밀리로 제공한다.
 
@@ -18,7 +18,7 @@
 - IBM Plex Mono의 라틴 디자인, 숫자, 문장부호와 true italic을 보존한다.
 - 마루 부리의 한글 조형을 2셀 환경에 맞춰 확대하고 광학적으로 중앙 정렬한다.
 - 일본어 가나와 한자에 정돈된 손글씨 또는 친근한 고딕 인상을 제공한다.
-- Klee One과 IBM Plex Sans JP를 동일 조건에서 비교해 최종 일본어 원본을 결정한다.
+- Klee One과 IBM Plex Sans JP를 동일 조건에서 비교한 결과에 따라 IBM Plex Sans JP를 최종 일본어 원본으로 사용한다.
 - 본문 크기와 디스플레이 크기에서 모두 읽기 좋은 한영일 혼용 결과를 만든다.
 - 편집기와 터미널에서 ASCII 1셀, CJK 2셀 정렬을 보장한다.
 - Powerline 및 Powerline Extra 구분자를 라틴 1셀 크기로 제공한다.
@@ -48,8 +48,8 @@
 | --- | --- | --- | --- |
 | 라틴 및 기본 OpenType 테이블 | [IBM Plex Mono 2.5.0](https://github.com/IBM/plex/releases/tag/%40ibm%2Fplex-mono%402.5.0) | `ibm-plex-mono.zip` | `6d23f01257663d8cc49a0d64c22ced630b79e0e2a0ac08a0da86e9a38bbc481c` |
 | 한글 및 한글 전각 문장부호 | [마루 부리 2022 완성본](https://hangeul.naver.com/font) | `maruburi.zip` | `39e3bb6a00b4543563a745195a6a89282c5a1f0f8b71923ff15c1bc7c135fa0c` |
-| 일본어 후보 A | [Klee One Version1.000](https://github.com/fontworks-fonts/Klee/releases/tag/Version1.000) | commit `8b0532731b63ad8a445ca341d8d7d941079b83ab` ZIP | `4ca4e5d364fa28a8035e0041d94feb745b4104cfda828d42b5d0d8f13bae83c7` |
-| 일본어 후보 B | [IBM Plex Sans JP 3.0.0](https://github.com/IBM/plex/releases/tag/%40ibm%2Fplex-sans-jp%403.0.0) | `ibm-plex-sans-jp.zip` | `4c14c41552934b0bc92fc216a76b36bdc78f745dfbeed1115f9b8bc405ee314f` |
+| 비교 실험 A | [Klee One Version1.000](https://github.com/fontworks-fonts/Klee/releases/tag/Version1.000) | commit `8b0532731b63ad8a445ca341d8d7d941079b83ab` ZIP | `4ca4e5d364fa28a8035e0041d94feb745b4104cfda828d42b5d0d8f13bae83c7` |
+| 일본어 원본 확정안 B | [IBM Plex Sans JP 3.0.0](https://github.com/IBM/plex/releases/tag/%40ibm%2Fplex-sans-jp%403.0.0) | `ibm-plex-sans-jp.zip` | `4c14c41552934b0bc92fc216a76b36bdc78f745dfbeed1115f9b8bc405ee314f` |
 | Powerline 글리프 | Nerd Fonts Font Patcher에 포함된 Powerline/Powerline Extra | Font Patcher 입력 자산 | Nerd Fonts 버전 결정 후 추가 |
 
 IBM Plex Mono에서는 complete TTF의 Regular, Italic, SemiBold, SemiBold Italic을 사용한다. IBM Plex Sans JP에서는 outline 변환 후 무효가 되는 힌팅을 가져오지 않도록 unhinted complete TTF의 Regular와 SemiBold를 사용한다. 마루 부리와 Klee One에서도 Regular와 SemiBold TTF만 추출한다.
@@ -106,13 +106,13 @@ Powerline 패밀리 이름은 다음과 같다.
 
 `name` ID 1과 16은 각각 `Gyeol Mono` 또는 `Gyeol Mono PL`로 통일한다. ID 2와 17은 `Regular`, `Italic`, `Bold`, `Bold Italic` 중 해당 값을 사용한다. ID 4와 6은 위 표의 Full/PostScript name을 사용한다.
 
-후보 비교 빌드는 동시에 설치해 비교할 수 있도록 사용자 노출 family를 `Gyeol Mono Preview A`와 `Gyeol Mono Preview B`로 분리한다. manifest에서 Preview A를 Klee One, Preview B를 IBM Plex Sans JP에 대응시키며 최종 릴리스에는 Preview 이름을 포함하지 않는다.
+후보 비교 빌드는 동시에 설치해 비교할 수 있도록 사용자 노출 family를 `Gyeol Mono Preview A`와 `Gyeol Mono Preview B`로 분리했다. manifest에서 Preview A는 Klee One, Preview B는 IBM Plex Sans JP에 대응한다. 비교 결과 B안을 확정했으며 최종 릴리스에는 Preview 이름이나 Klee One 글리프를 포함하지 않는다.
 
 ### 5.2 웨이트 및 스타일 매트릭스
 
 초기 릴리스는 터미널과 IDE의 RIBBI 선택에 맞춰 다음 네 face를 생성한다.
 
-| 출력 스타일 | 출력 CSS weight | IBM Plex Mono 원본 | 마루 부리 원본 | 일본어 후보 원본 |
+| 출력 스타일 | 출력 CSS weight | IBM Plex Mono 원본 | 마루 부리 원본 | IBM Plex Sans JP 원본 |
 | --- | ---: | --- | --- | --- |
 | Regular | 400 | Regular | Regular upright | Regular upright |
 | Italic | 400 | true Italic | Regular upright | Regular upright |
@@ -121,7 +121,7 @@ Powerline 패밀리 이름은 다음과 같다.
 
 두꺼운 face는 세 스크립트의 획 밀도를 일치시키기 위해 모두 SemiBold 600 원본을 사용한다. 다만 최종 사용자 노출 이름과 `OS/2.usWeightClass`는 Bold 700으로 설정한다. 이는 일부 터미널이 `SemiBold` face를 ANSI SGR 1 또는 Bold face로 선택하지 않는 문제를 피하기 위한 의도적인 매핑이다.
 
-후보 비교 단계에서는 Klee One과 IBM Plex Sans JP에 대해 각각 기본 패밀리 4개와 `PL` 패밀리 4개, 총 8개 정적 TTF를 생성한다. 두 후보를 합친 비교 산출물은 총 16개다. 최종 선택 후에는 선택한 일본어 원본의 8개 파일만 배포한다.
+후보 비교 단계에서는 Klee One과 IBM Plex Sans JP에 대해 각각 기본 패밀리 4개와 `PL` 패밀리 4개, 총 8개 정적 TTF를 생성한다. 두 후보를 합친 비교 산출물은 총 16개다. 최종 배포에는 IBM Plex Sans JP를 사용한 기본 패밀리 4개와 `PL` 패밀리 4개만 포함한다.
 
 ## 6. 글리프 소유권
 
@@ -148,7 +148,7 @@ Powerline 패밀리 이름은 다음과 같다.
 
 `₩`, 따옴표, 대시, 화살표, 괄호, 전각 ASCII처럼 둘 이상의 원본에 존재하는 문자는 실제 터미널 셀 동작과 시각적 조화를 확인한 후 allowlist로 관리한다.
 
-마루 부리와 일본어 후보에 포함된 라틴 글리프는 복사하지 않는다. 한자는 임의의 전체 Unicode 범위를 가정하지 않고 선택한 일본어 원본의 `cmap`에 실제로 존재하는 글리프만 복사한다.
+마루 부리와 IBM Plex Sans JP에 포함된 라틴 글리프는 복사하지 않는다. 한자는 임의의 전체 Unicode 범위를 가정하지 않고 IBM Plex Sans JP의 `cmap`에 실제로 존재하는 글리프만 복사한다.
 
 초기 버전의 한자 기본 형태는 일본어 원본이 제공하는 JP glyph form이다. 터미널과 IDE가 일반적으로 `ko` 또는 `ja` language tag를 제공하지 않는 점을 고려해 JP/KR `locl` 전환은 구현하지 않는다.
 
@@ -189,7 +189,7 @@ Regular TTF에서 확인한 주요 입력 메트릭은 다음과 같다.
 
 확대율은 스크립트와 웨이트별로 다를 수 있다. 한 개의 상수를 모든 CJK 글리프에 강제하지 않는다. 각 글리프는 요청 배율을 적용하되 셀의 수평 guard 또는 최종 수직 셀을 벗어나면 개별적으로 배율을 제한한다.
 
-Klee One과 IBM Plex Sans JP 비교 시에는 원본 자체의 차이만 평가할 수 있도록 동일한 후보 scale과 수직 셀을 먼저 적용한다. 이후 최종 후보가 결정되면 일본어 optical scale을 별도로 미세 조정한다.
+Klee One과 IBM Plex Sans JP 비교 빌드에는 원본 자체의 차이만 평가할 수 있도록 동일한 1.00 scale과 수직 셀을 적용했다. 최종 B안에서는 한글과 일본어 optical scale을 분리해 미세 조정할 수 있어야 한다.
 
 ### 7.3 수직 메트릭
 
@@ -217,7 +217,7 @@ Italic variant의 스크립트별 정책은 다음과 같다.
 | --- | --- |
 | 라틴, 숫자, ASCII 문장부호 | IBM Plex Mono true italic 유지 |
 | 한글 및 한글 전각 문장부호 | 동일 웨이트의 upright 마루 부리 사용 |
-| 가나, 한자 및 일본어 문장부호 | 동일 웨이트의 upright 일본어 후보 사용 |
+| 가나, 한자 및 일본어 문장부호 | 동일 웨이트의 upright IBM Plex Sans JP 사용 |
 | Powerline 및 Powerline Extra | upright 유지 |
 
 Powerline 구분자를 기울이면 셀 경계에 틈이 생기므로 italic variant에서도 기울이지 않는다. 한글과 일본어의 synthetic italic은 초기 버전에서 생성하지 않는다.
@@ -313,16 +313,16 @@ NFD 입력을 지원하기 위해 현대 한글 자모 시퀀스를 완성형 �
 2. IBM Plex Mono 원본을 기본 패밀리 branch로 유지
 3. IBM Plex Mono variant별 Powerline intermediate를 `PL` branch에 생성
 4. 두 branch 모두에서 라틴 advance 600 검증
-5. 마루 부리와 일본어 후보 글리프 수집 및 outline decomposition
+5. 마루 부리와 IBM Plex Sans JP 글리프 수집 및 outline decomposition
 6. 스크립트별 UPM 정규화, 확대, 중앙 정렬 및 클리핑 제한
 7. 각 branch에 한글·가나·한자 glyph, cmap 및 hmtx 병합
 8. NFD 한글용 `ccmp` 추가
 9. style bit, RIBBI 이름, 수직 메트릭 및 Unicode range 갱신
-10. Klee One 후보와 IBM Plex Sans JP 후보 TTF 저장
-11. 후보별 TTF를 다시 열어 구조 검증
+10. IBM Plex Sans JP 기반 TTF 저장
+11. 생성한 TTF를 다시 열어 구조 검증
 12. WOFF2 변환
-13. 동일 specimen과 렌더러로 후보 비교
-14. 최종 일본어 원본 선택 후 선택되지 않은 후보를 릴리스 산출물에서 제외
+13. 동일 specimen과 렌더러로 H0–H3 한글 optical correction 비교
+14. 확정한 correction으로 최종 산출물 재생성
 15. 라이선스와 manifest를 포함한 릴리스 패키지 생성
 
 제안하는 저장소 구조는 다음과 같다.
@@ -370,7 +370,7 @@ fonts/             # gitignored
 - Upright variant에 italic bit가 설정되지 않는다.
 - Italic variant에 italic bit와 올바른 italic angle이 설정된다.
 - Regular/Italic은 CSS weight 400, Bold/Bold Italic은 CSS weight 700으로 노출된다.
-- Bold outline이 IBM Plex Mono, 마루 부리와 일본어 후보의 SemiBold 600 원본에서 생성됐다는 사실을 manifest에 기록한다.
+- Bold outline이 IBM Plex Mono, 마루 부리와 IBM Plex Sans JP의 SemiBold 600 원본에서 생성됐다는 사실을 manifest에 기록한다.
 - family grouping이 macOS, Windows 및 브라우저에서 동일하게 동작한다.
 - Italic 라틴 outline이 IBM Plex Mono의 true italic 원본과 일치한다.
 - Italic variant의 한글, 일본어와 Powerline은 기울지 않는다.
@@ -416,9 +416,9 @@ Il1| O0 0123456789 ()[]{} <> != == ->
 
 Powerline 검수에서는 연속된 배경색 블록 사이에 1px 틈, 잘림 또는 italic 기울기 흔적이 없어야 한다.
 
-### 12.5 일본어 후보 선택 기준
+### 12.5 일본어 후보 선택 기준 및 결론
 
-Klee One을 디자인 후보, IBM Plex Sans JP를 가독성과 웨이트 일관성의 기준 후보로 평가한다. 두 후보를 한 최종 패밀리에 혼합하지 않는다.
+Klee One을 디자인 후보, IBM Plex Sans JP를 가독성과 웨이트 일관성의 기준 후보로 평가했다. 두 후보를 한 최종 패밀리에 혼합하지 않는다.
 
 평가 우선순위는 다음과 같다.
 
@@ -428,6 +428,23 @@ Klee One을 디자인 후보, IBM Plex Sans JP를 가독성과 웨이트 일관�
 4. IBM Plex Mono true italic과 upright 일본어의 혼용 자연스러움
 5. 가나·한자 커버리지와 fallback 발생 여부
 6. TTF/WOFF2 파일 크기와 빌드 시간
+
+### 12.6 프로토타입 결론과 후속 모멘텀
+
+2026-07-11에 CJK scale 1.00으로 Preview A와 B의 RIBBI 기본 패밀리를 빌드해 동일 specimen으로 비교했다. Klee One 기반 Preview A는 손글씨 성격이 IBM Plex Mono와 마루 부리 사이에서 독립적으로 두드러졌고, 터미널·IDE용 혼용 글꼴로는 조형 연결이 어색했다. IBM Plex Sans JP 기반 Preview B는 Regular/SemiBold의 획 구조가 더 안정적이고 일본어 outline 커버리지도 더 넓어 최종 일본어 원본으로 확정한다.
+
+Preview B에서도 Regular face의 마루 부리가 IBM Plex Mono Regular 및 IBM Plex Sans JP Regular보다 가늘게 보이는 문제가 남았다. 다음 네 한글 조합을 동일한 라틴·일본어 1.00 scale과 specimen에서 비교한다.
+
+| 실험 | 마루 부리 원본 | 한글 scale | 목적 |
+| --- | --- | ---: | --- |
+| H0 | Regular | 1.00 | 현재 기준선 |
+| H1 | Regular | 1.05 | 최소 광학 확대 |
+| H2 | Regular | 1.10 | 확대만으로 가능한 보정 상한 확인 |
+| H3 | SemiBold | 0.96 | 굵은 outline을 축소해 크기와 획 밀도 동시 조정 |
+
+마루 부리 Regular와 SemiBold의 공통 cmap 12,398자 중 outline topology가 직접 보간 가능한 글리프는 403자, 약 3.25%에 불과했다. 따라서 두 정적 폰트 사이의 일반적인 좌표 보간은 사용하지 않는다. 임의 outline embolden은 부리, counter와 교차 획을 손상시킬 수 있으므로 위 네 실험으로 충분한 결과를 얻지 못했을 때만 별도 스펙으로 검토한다.
+
+후속 조정은 한글 scale과 일본어 scale을 별도 파라미터로 분리하고, 각 후보에 대해 12-unit 수평 guard, `-275:1025` 수직 셀, 600/1,200 advance 및 Regular/Bold 간 대비를 다시 검증해야 한다. 이 항목이 마루 부리 optical correction을 확정하기 위한 다음 작업 단위다.
 
 ## 13. 재현성과 배포
 
@@ -459,16 +476,15 @@ licenses/
   NERD-FONTS-LICENSE.txt
 ```
 
-후보 비교 archive에는 두 일본어 후보의 고지를 모두 포함한다. 공개 릴리스 archive에는 최종 선택한 일본어 원본의 고지만 포함한다. 공개 릴리스 전에 결합 결과물에 적용되는 라이선스 조합과 고지 문구를 최종 검토한다.
+후보 비교 archive에는 두 일본어 후보의 고지를 모두 포함한다. 공개 릴리스 archive에는 IBM Plex Sans JP의 고지만 포함하고 Klee One 고지는 포함하지 않는다. 공개 릴리스 전에 결합 결과물에 적용되는 라이선스 조합과 고지 문구를 최종 검토한다.
 
 ## 15. 미결정 사항
 
-- 최종 일본어 원본: Klee One 또는 IBM Plex Sans JP
-- Regular/Bold의 한글 및 일본어 확대율
+- H0–H3 비교에 따른 Regular 한글 원본 및 확대율
+- Bold의 한글 확대율과 IBM Plex Sans JP의 웨이트별 optical scale
 - 스크립트·웨이트별 수평/수직 optical correction 값
 - 전각/반각 및 중복 기호 allowlist
 - 기본 패밀리와 `PL` 패밀리를 모두 배포할지 여부
-- Klee One 기반 Bold가 터미널 환경에서 충분한 시각적 강조를 제공하는지 여부
 - 향후 JP/KR `locl` glyph form 지원 여부
 - 향후 synthetic CJK italic 실험 여부
 
@@ -476,8 +492,9 @@ licenses/
 
 - 라틴은 600, 한글·가나·한자는 1,200의 duospace 구조를 사용한다.
 - 한글은 마루 부리 upright outline을 확대·중앙 정렬해 사용한다.
-- 일본어 원본 후보는 Klee One과 IBM Plex Sans JP로 제한하고 동일 조건의 별도 빌드로 비교한다.
-- 두 일본어 후보를 한 최종 패밀리 안에서 혼합하지 않는다.
+- 동일 조건의 Preview A/B 비교 결과 최종 일본어 원본은 IBM Plex Sans JP로 확정한다.
+- Klee One은 비교 실험 기록으로만 유지하고 최종 릴리스에는 포함하지 않는다.
+- 마루 부리 Regular의 굵기 보정은 H0–H3 후속 비교로 결정하며 정적 Regular/SemiBold outline의 직접 보간은 사용하지 않는다.
 - 최종 family name은 `Gyeol Mono`, Powerline family name은 `Gyeol Mono PL`을 사용한다.
 - 한국어 표시 이름은 `결 모노`를 사용하되 OpenType family name과 PostScript name은 ASCII로 유지한다.
 - IBM Plex Mono true italic을 보존한다.

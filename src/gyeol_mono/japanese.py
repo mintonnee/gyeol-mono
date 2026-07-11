@@ -9,6 +9,9 @@ class JapaneseSource(StrEnum):
     IBM_PLEX_SANS_JP = "ibm-plex-sans-jp"
 
 
+FINAL_JAPANESE_SOURCE = JapaneseSource.IBM_PLEX_SANS_JP
+
+
 @dataclass(frozen=True, slots=True)
 class JapaneseCandidate:
     source: JapaneseSource

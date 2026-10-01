@@ -40,5 +40,20 @@ TTF용 quadratic 윤곽으로 변환해 병합할 수 있습니다.
 마루 부리/리디바탕 한글 비교 페이지의 재생성 방법은 `comparisons/hangul/README.md`,
 상세 설계와 이전 실험 기록은 `docs/specs/001-build-display-serif-mono.md`를 참조하세요.
 
-마루 부리는 [네이버 글꼴 모음 공식 배포본](https://hangeul.naver.com/font)을 사용합니다.
-배포 패키지에는 각 원본의 라이선스와 저작권 고지가 필요합니다.
+## 라이선스
+
+이 저장소의 빌드 스크립트·문서와 여기서 생성하는 Gyeol Mono 글꼴은
+[SIL Open Font License 1.1](LICENSE)로 배포합니다. Gyeol Mono는 아래 OFL 글꼴의
+Modified Version이므로 같은 라이선스를 그대로 따르며, 원본 저작권 고지는 `LICENSE`에
+포함되어 있습니다.
+
+| 원본 | 저작권자 | Reserved Font Name |
+| --- | --- | --- |
+| [IBM Plex Mono, IBM Plex Sans JP](https://github.com/IBM/plex) | IBM Corp. | `Plex` |
+| [마루 부리](https://hangeul.naver.com/font) | NAVER Corporation | `MaruBuri` 외 네이버 글꼴 이름 |
+
+- 글꼴 이름에 Reserved Font Name을 쓰지 않기 위해 패밀리 이름은 `Gyeol Mono`입니다.
+  수정해 재배포할 때도 위 이름은 사용할 수 없습니다.
+- 글꼴 파일을 재배포할 때는 `LICENSE`를 함께 포함해야 하며, 글꼴만 단독으로 판매할 수 없습니다.
+- IBM, 네이버를 비롯한 원저작자는 이 결과물을 보증하거나 후원하지 않습니다.
+- 비교 실험용 Klee One과 리디바탕도 OFL 1.1 글꼴이지만 최종 글꼴에는 포함되지 않습니다.

@@ -28,6 +28,10 @@ class FaceSpec:
         weight = "Regular" if self.source_weight == 400 else "SemiBold"
         return f"{weight} upright"
 
+    @property
+    def hangul_source_style(self) -> str:
+        return self.cjk_source_style
+
 
 FACES = (
     FaceSpec(Style.REGULAR, 400, 400, "Regular", italic=False),

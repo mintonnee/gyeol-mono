@@ -2,7 +2,7 @@
 
 - 상태: Draft
 - 작성일: 2026-07-11
-- 최종 수정일: 2026-07-11
+- 최종 수정일: 2026-10-01
 - 대상 구현: 정적 TTF 및 WOFF2 패밀리
 
 ## 1. 개요
@@ -35,10 +35,10 @@
 - ExtraLight, Light, Medium, SemiBold, ExtraBold 등 별도 사용자 노출 웨이트
 - Klee One과 IBM Plex Sans JP를 한 최종 패밀리 안에서 혼합해 사용하는 구성
 - CJK 언어 태그에 따른 JP/KR `locl` 전환
-- CFF outline 기반 OTF
+- CFF outline 기반 OTF 출력 (CFF 입력은 지원)
 - 원본 폰트의 소스 편집 또는 새로운 글리프 디자인
 
-초기 출력 포맷은 TTF와 WOFF2로 제한한다. OTF가 필요하면 별도 스펙에서 CFF 변환 및 힌팅 정책을 정의한다.
+초기 출력 포맷은 TTF와 WOFF2로 제한한다. 한글 원본이 CFF 윤곽(예: 비교용 리디바탕 OTF)이면 0.001 em 허용 근사 오차로 quadratic으로 변환하고 TrueType 방향으로 반전한다. 원본 한글 힌팅은 가져오지 않는다.
 
 ## 4. 원본과 버전 고정
 
@@ -48,13 +48,14 @@
 | --- | --- | --- | --- |
 | 라틴 및 기본 OpenType 테이블 | [IBM Plex Mono 2.5.0](https://github.com/IBM/plex/releases/tag/%40ibm%2Fplex-mono%402.5.0) | `ibm-plex-mono.zip` | `6d23f01257663d8cc49a0d64c22ced630b79e0e2a0ac08a0da86e9a38bbc481c` |
 | 한글 및 한글 전각 문장부호 | [마루 부리 2022 완성본](https://hangeul.naver.com/font) | `maruburi.zip` | `39e3bb6a00b4543563a745195a6a89282c5a1f0f8b71923ff15c1bc7c135fa0c` |
+| 한글 비교 실험 | [리디바탕 1.0.1 Build 20191001](https://ridicorp.com/ridibatang/) | `RIDIBatang.otf` | `f13a49c0815d254ac15e392953a0b056613dec08ceb378e54eeed14c4fda9a54` |
 | 비교 실험 A | [Klee One Version1.000](https://github.com/fontworks-fonts/Klee/releases/tag/Version1.000) | commit `8b0532731b63ad8a445ca341d8d7d941079b83ab` ZIP | `4ca4e5d364fa28a8035e0041d94feb745b4104cfda828d42b5d0d8f13bae83c7` |
 | 일본어 원본 확정안 B | [IBM Plex Sans JP 3.0.0](https://github.com/IBM/plex/releases/tag/%40ibm%2Fplex-sans-jp%403.0.0) | `ibm-plex-sans-jp.zip` | `4c14c41552934b0bc92fc216a76b36bdc78f745dfbeed1115f9b8bc405ee314f` |
 | Powerline 글리프 | Nerd Fonts Font Patcher에 포함된 Powerline/Powerline Extra | Font Patcher 입력 자산 | Nerd Fonts 버전 결정 후 추가 |
 
 IBM Plex Mono에서는 complete TTF의 Regular, Italic, SemiBold, SemiBold Italic을 사용한다. IBM Plex Sans JP에서는 outline 변환 후 무효가 되는 힌팅을 가져오지 않도록 unhinted complete TTF의 Regular와 SemiBold를 사용한다. 마루 부리와 Klee One에서도 Regular와 SemiBold TTF만 추출한다.
 
-Klee의 `Version1.000`은 별도 GitHub Release asset이 아니라 태그이므로 태그가 가리키는 commit `8b0532731b63ad8a445ca341d8d7d941079b83ab`의 codeload ZIP을 고정한다. 마루 부리 ZIP에는 라이선스 파일이 포함되어 있지 않으므로 배포 패키지를 만들 때 [네이버 라이선스 전문](https://help.naver.com/service/30016/contents/18088?osType=PC&lang=ko)을 별도로 포함한다.
+Klee의 `Version1.000`은 별도 GitHub Release asset이 아니라 태그이므로 태그가 가리키는 commit `8b0532731b63ad8a445ca341d8d7d941079b83ab`의 codeload ZIP을 고정한다. 마루 부리 ZIP에는 라이선스 파일이 포함되어 있지 않으므로 배포 패키지를 만들 때 [네이버 라이선스 전문](https://help.naver.com/service/30016/contents/18088?osType=PC&lang=ko)을 별도로 포함한다. 리디바탕은 비교 재현용 소스로만 보존한다. ZIP이 아닌 단일 파일이며 `archive_format = "file"`로 선언하고, 공식 URL의 내용이 바뀌면 SHA-256 검증에서 중단한다.
 
 다운로더는 `sources.toml`의 URL 및 SHA-256을 검증하고 선언된 파일만 `upstream/` 아래에 추출한다. `latest` URL을 빌드 입력으로 직접 사용하면 안 된다. 원본 파일과 생성 파일은 Git에서 제외하고 manifest만 추적한다.
 
@@ -63,6 +64,7 @@ Klee의 `Version1.000`은 별도 GitHub Release asset이 아니라 태그이므�
 - [IBM Plex](https://github.com/IBM/plex)
 - [IBM Plex 라이선스](https://github.com/IBM/plex/blob/master/LICENSE.txt)
 - [네이버 글꼴 모음 및 마루 부리 사용 안내](https://hangeul.naver.com/font)
+- [리디바탕 공식 배포 및 라이선스 안내](https://ridicorp.com/ridibatang/)
 - [Klee One 메타데이터](https://github.com/google/fonts/blob/main/ofl/kleeone/METADATA.pb)
 - [Klee One 설명](https://github.com/google/fonts/blob/main/ofl/kleeone/DESCRIPTION.en_us.html)
 - [IBM Plex Sans JP 메타데이터](https://github.com/google/fonts/blob/main/ofl/ibmplexsansjp/METADATA.pb)
@@ -119,7 +121,7 @@ Powerline 패밀리 이름은 다음과 같다.
 | Bold | 700 | SemiBold | SemiBold upright | SemiBold upright |
 | Bold Italic | 700 | SemiBold Italic | SemiBold upright | SemiBold upright |
 
-두꺼운 face는 세 스크립트의 획 밀도를 일치시키기 위해 모두 SemiBold 600 원본을 사용한다. 다만 최종 사용자 노출 이름과 `OS/2.usWeightClass`는 Bold 700으로 설정한다. 이는 일부 터미널이 `SemiBold` face를 ANSI SGR 1 또는 Bold face로 선택하지 않는 문제를 피하기 위한 의도적인 매핑이다.
+두꺼운 face는 세 스크립트의 획 밀도를 일치시키기 위해 모두 SemiBold 600 원본을 사용한다. Synthetic embolden은 적용하지 않는다. 다만 최종 사용자 노출 이름과 `OS/2.usWeightClass`는 Bold 700으로 설정한다. 이는 일부 터미널이 `SemiBold` face를 ANSI SGR 1 또는 Bold face로 선택하지 않는 문제를 피하기 위한 의도적인 매핑이다.
 
 후보 비교 단계에서는 Klee One과 IBM Plex Sans JP에 대해 각각 기본 패밀리 4개와 `PL` 패밀리 4개, 총 8개 정적 TTF를 생성한다. 두 후보를 합친 비교 산출물은 총 16개다. 최종 배포에는 IBM Plex Sans JP를 사용한 기본 패밀리 4개와 `PL` 패밀리 4개만 포함한다.
 
@@ -146,6 +148,8 @@ Powerline 패밀리 이름은 다음과 같다.
 | 전각 및 반각 문자 `U+FF00–U+FFEF` | 문자별 allowlist | 600 또는 1,200 |
 | Powerline 및 Powerline Extra | Nerd Fonts 자산 | 600 |
 
+위 한글 범위는 소유권 규칙이며 실제 원본 `cmap`에 있는 글리프만 복사한다. 마루 부리는 완성형 11,172자와 호환용 자모 51자를 지원하지만 결합 자모 `U+1100–U+11FF`와 자모 확장-A/B는 포함하지 않는다. 현재 빌더는 NFD 조합을 지원하지 않는다.
+
 `₩`, 따옴표, 대시, 화살표, 괄호, 전각 ASCII처럼 둘 이상의 원본에 존재하는 문자는 실제 터미널 셀 동작과 시각적 조화를 확인한 후 allowlist로 관리한다.
 
 마루 부리와 IBM Plex Sans JP에 포함된 라틴 글리프는 복사하지 않는다. 한자는 임의의 전체 Unicode 범위를 가정하지 않고 IBM Plex Sans JP의 `cmap`에 실제로 존재하는 글리프만 복사한다.
@@ -161,10 +165,10 @@ Regular TTF에서 확인한 주요 입력 메트릭은 다음과 같다.
 | unitsPerEm | 1,000 | 1,000 |
 | 대표 라틴 `A` advance | 600 | 675 |
 | 한글 `가` advance | 없음 | 970 |
-| hhea ascent | 1,025 | 800 |
-| hhea descent | -275 | -200 |
-| Typo ascender | 780 | 800 |
-| Typo descender | -220 | -200 |
+| hhea ascent | 1,025 | 965 |
+| hhea descent | -275 | -380 |
+| Typo ascender | 780 | 965 |
+| Typo descender | -220 | -380 |
 
 ### 7.1 수평 메트릭
 
@@ -301,7 +305,7 @@ CJK 병합 시 다음 테이블을 갱신해야 한다.
 - `post`: fixed-pitch 정보와 italic angle
 - `name`: 새 family, subfamily, full name, PostScript name
 
-NFD 입력을 지원하기 위해 현대 한글 자모 시퀀스를 완성형 한글로 shaping하는 `ccmp` lookup을 제공한다. NFC `한글`과 NFD `한글`은 동일한 2셀 결과를 만들어야 한다.
+목표 기능(현재 미구현): NFD 입력을 지원하기 위해 현대 한글 자모 시퀀스를 완성형 한글로 shaping하는 `ccmp` lookup을 제공한다. NFC `한글`과 NFD `한글`은 동일한 2셀 결과를 만들어야 한다.
 
 일본어 원본의 outline과 `cmap`은 복사하지만, monospace advance를 깨뜨릴 수 있는 `palt`, `pkna` 등의 proportional feature는 초기 버전에 포함하지 않는다. 세로쓰기용 `vert`와 `vrt2`, JP/KR glyph form 전환용 `locl`도 초기 범위에서 제외한다.
 
@@ -370,7 +374,7 @@ fonts/             # gitignored
 - Upright variant에 italic bit가 설정되지 않는다.
 - Italic variant에 italic bit와 올바른 italic angle이 설정된다.
 - Regular/Italic은 CSS weight 400, Bold/Bold Italic은 CSS weight 700으로 노출된다.
-- Bold outline이 IBM Plex Mono, 마루 부리와 IBM Plex Sans JP의 SemiBold 600 원본에서 생성됐다는 사실을 manifest에 기록한다.
+- Bold outline이 IBM Plex Mono, 마루 부리와 IBM Plex Sans JP의 SemiBold 600 원본에서 생성됐다는 사실을 빌드 계획에 기록한다.
 - family grouping이 macOS, Windows 및 브라우저에서 동일하게 동작한다.
 - Italic 라틴 outline이 IBM Plex Mono의 true italic 원본과 일치한다.
 - Italic variant의 한글, 일본어와 Powerline은 기울지 않는다.
@@ -446,6 +450,14 @@ Preview B에서도 Regular face의 마루 부리가 IBM Plex Mono Regular 및 IB
 
 후속 조정은 한글 scale과 일본어 scale을 별도 파라미터로 분리하고, 각 후보에 대해 12-unit 수평 guard, `-275:1025` 수직 셀, 600/1,200 advance 및 Regular/Bold 간 대비를 다시 검증해야 한다. 이 항목이 마루 부리 optical correction을 확정하기 위한 다음 작업 단위다.
 
+### 12.7 리디바탕 시안 (2026-09-24, 철회됨)
+
+동일한 라틴·일본어와 scale 1.00에서 마루 부리와 리디바탕을 비교한 뒤 리디바탕을 한글 원본으로 선택해 preview를 빌드했다. 리디바탕은 Regular 한 굵기만 제공하므로 이 시안에서는 RIBBI 전체가 Regular 한글을 사용했고 Bold 한글의 별도 굵기가 없었다. 비교 페이지와 재생성 방법은 `comparisons/hangul/`에 남아 있다.
+
+### 12.8 마루 부리 재확정 (2026-10-01)
+
+리디바탕 시안을 실제 폰트로 빌드해 사용해 본 뒤, 사용자가 한글 베이스로 마루 부리가 더 낫다고 판단해 마루 부리를 한글 원본으로 되돌렸다. Regular/Italic은 마루 부리 Regular, Bold/Bold Italic은 마루 부리 SemiBold를 사용하므로 Bold 한글의 강조 차이가 복원된다. 리디바탕은 `sources.toml`에 `hangul-comparison-only` 역할로만 남기며, 이때 추가한 단일 파일 다운로드와 CFF 입력 변환은 범용 기능으로 유지한다. 12.6의 Regular 굵기 보정(H0–H3)은 다시 미결 과제다. 현재 구현 범위는 non-Powerline preview TTF/WOFF2이며, PL 및 NFD shaping은 기존대로 미구현이다.
+
 ## 13. 재현성과 배포
 
 - 빌드 도구와 Python 의존성 버전을 lockfile로 고정한다.
@@ -459,7 +471,7 @@ Preview B에서도 Regular face의 마루 부리가 IBM Plex Mono Regular 및 IB
 
 - IBM Plex는 SIL Open Font License 1.1을 사용하며 `Plex`는 Reserved Font Name이다.
 - 최종 family name에는 `Plex`를 사용하지 않는다.
-- 마루 부리는 수정과 재배포가 허용되지만 네이버와 네이버문화재단의 저작권 안내 및 라이선스 전문을 포함해야 한다.
+- 마루 부리는 수정과 재배포가 허용되지만 네이버와 네이버문화재단의 저작권 안내 및 라이선스 전문을 포함해야 한다. 리디바탕(SIL OFL 1.1)을 담는 비교 패키지에만 리디주식회사 고지가 필요하다.
 - Klee One은 SIL Open Font License 1.1이며, 후보 비교 및 Klee 기반 결과물에는 원본 저작권 고지를 포함한다.
 - IBM Plex Sans JP는 SIL Open Font License 1.1이며, IBM Plex Mono와 동일하게 최종 family name에서 `Plex`를 사용하지 않는다.
 - Powerline 자산을 포함하는 `PL` 패밀리에는 Nerd Fonts 및 해당 glyph source의 라이선스 고지를 추가한다.
@@ -480,7 +492,7 @@ licenses/
 
 ## 15. 미결정 사항
 
-- H0–H3 비교에 따른 Regular 한글 원본 및 확대율
+- H0–H3 비교에 따른 Regular 한글 원본 및 확대율 (현재 기본값 Regular 1.00)
 - Bold의 한글 확대율과 IBM Plex Sans JP의 웨이트별 optical scale
 - 스크립트·웨이트별 수평/수직 optical correction 값
 - 전각/반각 및 중복 기호 allowlist
@@ -494,13 +506,14 @@ licenses/
 - 한글은 마루 부리 upright outline을 확대·중앙 정렬해 사용한다.
 - 동일 조건의 Preview A/B 비교 결과 최종 일본어 원본은 IBM Plex Sans JP로 확정한다.
 - Klee One은 비교 실험 기록으로만 유지하고 최종 릴리스에는 포함하지 않는다.
-- 마루 부리 Regular의 굵기 보정은 H0–H3 후속 비교로 결정하며 정적 Regular/SemiBold outline의 직접 보간은 사용하지 않는다.
+- 리디바탕 시안을 철회하고 마루 부리를 한글 원본으로 재확정한다. 리디바탕은 비교 실험 기록으로만 유지한다.
+- 마루 부리 Regular의 굵기 보정은 H0–H3 후속 비교로 결정하며 정적 Regular/SemiBold outline의 직접 보간은 사용하지 않는다. 기본 배율은 1.00이다.
 - 최종 family name은 `Gyeol Mono`, Powerline family name은 `Gyeol Mono PL`을 사용한다.
 - 한국어 표시 이름은 `결 모노`를 사용하되 OpenType family name과 PostScript name은 ASCII로 유지한다.
 - IBM Plex Mono true italic을 보존한다.
 - Italic variant에서도 모든 CJK 글리프와 Powerline은 upright로 유지한다.
 - 사용자 노출 웨이트는 Regular와 Bold 두 개로 제한하고 RIBBI 네 face를 제공한다.
-- Bold face는 세 스크립트의 SemiBold 600 outline을 사용하되 Bold 700 메타데이터로 노출한다.
+- Bold face는 세 스크립트의 SemiBold 600 outline을 사용하되 Bold 700 메타데이터로 노출한다. 한글 synthetic bold는 적용하지 않는다.
 - Powerline Core와 Extra만 포함하며 전체 Nerd Fonts 세트는 포함하지 않는다.
 - Powerline은 IBM Plex Mono에 먼저 패치한 뒤 한글을 병합한다.
 - `--mono` 대신 `--single-width-glyphs`를 사용한다.

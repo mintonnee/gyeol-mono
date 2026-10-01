@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>마루 부리 × 리디바탕 — Gyeol Mono 비교</title>
+<style>
+@font-face{font-family:Maru;src:url(GyeolCompareMaru-Regular.woff2)}
+@font-face{font-family:Ridi;src:url(GyeolCompareRidi-Regular.woff2)}
+:root{--bg:#f5f3ee;--panel:#fffefa;--fg:#252b29;--muted:#63716b;--border:#d7ddd6;--size:16px;--leading:1.65}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,sans-serif}
+body.dark{--bg:#161b1a;--panel:#202725;--fg:#e0e6df;--muted:#a7b6ad;--border:#3d4b43}
+main{max-width:1500px;margin:auto;padding:40px 30px}header{max-width:900px}h1{font-size:32px;letter-spacing:-1.5px;margin:12px 0}p{line-height:1.7;color:var(--muted)}
+.kicker{font-size:12px;letter-spacing:3px;color:var(--muted)}.toolbar{position:sticky;top:0;z-index:1;display:flex;gap:22px;flex-wrap:wrap;align-items:center;padding:18px 0;background:var(--bg);border-bottom:1px solid var(--border)}
+label{display:flex;align-items:center;gap:10px;font-size:14px}button,select{padding:8px 12px;background:var(--panel);color:var(--fg);border:1px solid var(--border);border-radius:6px}input{accent-color:#43816b}h2{font-size:14px;font-weight:600;margin-top:28px}.pair{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{min-width:0;background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden}.caption{display:flex;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--border);font-size:13px}.caption span{color:var(--muted)}pre{margin:0;padding:20px;overflow:auto;font-size:var(--size);line-height:var(--leading);font-weight:400;font-synthesis:none;font-variant-ligatures:none;tab-size:4}.maru{font-family:Maru,monospace}.ridi{font-family:Ridi,monospace}textarea{width:100%;height:90px;padding:12px;background:var(--panel);color:var(--fg);border:1px solid var(--border);border-radius:8px;font-size:16px}footer{margin-top:40px;font-size:13px;color:var(--muted)}a{color:inherit}#status{font-size:13px}body.grid pre{background-image:repeating-linear-gradient(to right,transparent 0,transparent calc(var(--size)*.6 - 1px),var(--border) calc(var(--size)*.6 - 1px),var(--border) calc(var(--size)*.6));background-origin:content-box}
+@media(max-width:850px){.pair{grid-template-columns:1fr}main{padding:24px 16px}}
+</style>
+<main><header><div class="kicker">GYEOL MONO / HANGUL STUDY 01</div><h1>마루 부리 × 리디바탕</h1>
+<p>같은 영문, 같은 일본어, 같은 셀에서 한글의 인상을 비교합니다.<br>Regular · 윤곽 배율 1.00 · 영문 600 / 한글 1200 units · UPM 1000</p>
+<p>두 시안 모두 IBM Plex Mono + IBM Plex Sans JP를 사용합니다. 리디바탕 CFF 윤곽은 TTF용으로 변환했습니다. 한글은 원본 비례폭을 유지한 윤곽을 2셀 중앙에 배치합니다. 굵게·기울임 합성과 원본 한글 힌팅은 적용하지 않습니다.</p></header>
+<div class="toolbar"><label>크기 <input id="size" type="range" min="12" max="32" value="16"><output id="sizeValue">16 px</output></label>
+<label>행간 <select id="leading"><option>1.3</option><option selected>1.65</option><option>2</option></select></label>
+<button id="theme">어두운 배경</button><label><input id="grid" type="checkbox">600-unit 셀 표시</label><span id="status">폰트 로딩 중…</span></div>
+<div id="samples"></div><h2>직접 입력</h2><textarea id="custom" aria-label="비교할 문장">한글 주석과 English code를 함께 비교합니다.</textarea><div id="customPair"></div>
+<footer><p>분해형(NFD)은 두 원본 모두 결합 자모가 없어 시스템 대체 글꼴이 나타날 수 있습니다. 해당 행은 서체 미감 평가가 아닌 지원 여부 진단용입니다. 원본 GSUB/GPOS는 이 비교 빌드에 이식하지 않았습니다. Powerline·Bold·Italic 검증은 포함하지 않습니다.</p>
+<p><a href="metrics.json">요약 데이터 JSON</a> · <a href="glyph-metrics.csv">전체 한글 글리프 CSV</a> · <a href="GyeolCompareRidi-Regular.ttf">리디 합성 TTF</a> · <a href="GyeolCompareMaru-Regular.ttf">마루 합성 TTF</a></p>
+<p>리디주식회사 제공 리디바탕 사용 · <a href="https://ridicorp.com/ridibatang/">공식 출처·라이선스</a>. 비교용 로컬 실험이며 기존 릴리스 폰트와 별도 이름을 사용합니다.</p></footer></main>
+<script>
+const samples=__SAMPLES__;
+function pair(text){const row=document.createElement('div');row.className='pair';for(const [cls,title] of [['maru','마루 부리'],['ridi','리디바탕']]){const card=document.createElement('div');card.className='card';const cap=document.createElement('div');cap.className='caption';cap.textContent=title;const tag=document.createElement('span');tag.textContent='Regular / 1.00';cap.append(tag);const pre=document.createElement('pre');pre.className=cls;pre.textContent=text;card.append(cap,pre);row.append(card)}return row}
+for(const s of samples){const h=document.createElement('h2');h.textContent=s.label;document.querySelector('#samples').append(h,pair(s.text))}
+const custom=document.querySelector('#custom');const cp=document.querySelector('#customPair');function update(){cp.replaceChildren(pair(custom.value))}custom.addEventListener('input',update);update();
+document.querySelector('#size').oninput=e=>{document.documentElement.style.setProperty('--size',e.target.value+'px');document.querySelector('#sizeValue').textContent=e.target.value+' px'};
+document.querySelector('#leading').onchange=e=>document.documentElement.style.setProperty('--leading',e.target.value);
+document.querySelector('#theme').onclick=e=>{document.body.classList.toggle('dark');e.target.textContent=document.body.classList.contains('dark')?'밝은 배경':'어두운 배경'};
+document.querySelector('#grid').onchange=e=>document.body.classList.toggle('grid',e.target.checked);
+Promise.all([document.fonts.load('16px Maru','한글'),document.fonts.load('16px Ridi','한글')]).then(fonts=>{if(fonts.some(f=>!f.length))throw Error();document.querySelector('#status').textContent='두 비교 폰트 로드 완료'}).catch(()=>document.querySelector('#status').textContent='폰트 로드 실패 — 로컬 HTTP 서버로 열어주세요');
+</script></html>

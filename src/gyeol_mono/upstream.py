@@ -33,10 +33,15 @@ class UpstreamSource:
     files: tuple[str, ...]
     revision: str | None = None
     license_url: str | None = None
+    archive_format: str = "zip"
 
     def __post_init__(self) -> None:
         if not self.id or not self.files:
             raise ManifestError("source id and files must not be empty")
+        if self.archive_format not in {"zip", "file"}:
+            raise ManifestError(f"unsupported archive format: {self.archive_format}")
+        if self.archive_format == "file" and len(self.files) != 1:
+            raise ManifestError("raw file sources must declare exactly one file")
         if not SHA256_PATTERN.fullmatch(self.sha256):
             raise ManifestError(f"invalid SHA-256 for {self.id}: {self.sha256}")
         if not self.url.startswith("https://") or not self.release_page.startswith("https://"):
@@ -89,6 +94,7 @@ def load_manifest(path: Path) -> UpstreamManifest:
                 files=tuple(item["files"]),
                 revision=item.get("revision"),
                 license_url=item.get("license_url"),
+                archive_format=item.get("archive_format", "zip"),
             )
             for item in data["source"]
         )
@@ -146,6 +152,13 @@ def _download_verified(source: UpstreamSource, archive_path: Path) -> None:
 def _extract_declared_files(
     source: UpstreamSource, archive_path: Path, destination: Path
 ) -> tuple[Path, ...]:
+    if source.archive_format == "file":
+        output_path = destination.joinpath(*PurePosixPath(source.files[0]).parts)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        partial_path = output_path.with_suffix(f"{output_path.suffix}.part")
+        shutil.copyfile(archive_path, partial_path)
+        partial_path.replace(output_path)
+        return (output_path,)
     with zipfile.ZipFile(archive_path) as archive:
         missing = sorted(set(source.files) - set(archive.namelist()))
         if missing:

@@ -1,0 +1,9 @@
+[
+  {"label":"한글 본문", "text":"서버는 요청을 받은 순서와 처리한 순서를 구분한다.\n짧은 문장도 긴 로그도 편안하게 읽히는지 확인합니다.\n값을 읽고 쓴 뒤, 잠금을 풀고 다음 작업을 실행합니다."},
+  {"label":"복잡한 받침 · 비슷한 형태", "text":"값 갚 같 갑 / 읽 익 잃 일 / 앉 않 안 / 삶 삼 삵\n뼈 뻐 뻬 빼 / 꿰 꽤 꾀 / 흙 닭 읊 넋 몫 핥\n가각간갇갈감갑갓강 갸걔거게겨계고과괘괴"},
+  {"label":"Go · 한글 주석", "text":"// 요청이 취소되면 작업을 중단한다.\nfunc 처리(ctx context.Context) error {\n    if err := ctx.Err(); err != nil {\n        return err // 취소 또는 제한 시간 초과\n    }\n    return nil\n}"},
+  {"label":"운영 로그 · 혼합 문장", "text":"INFO  요청 완료 status=200 latency=12.8ms\nWARN  재시도 중 retry=3/5 timeout=1500ms\nERROR 연결 실패 host=db-primary port=5432\n배포 Deployment / 동시성 Concurrency / 日本語 あいうえお"},
+  {"label":"2셀 정렬 · 기호", "text":"| ABCD | 1234 | abcd |\n| 한글 | 비교 | 정렬 |\n| 가나 | 다라 | 마바 |\n0O 1Il {} [] () <> != == => -> / \\ | ~"},
+  {"label":"호환 자모", "text":"ㄱ ㄲ ㄴ ㄷ ㄸ ㄹ ㅁ ㅂ ㅃ ㅅ ㅆ ㅇ ㅈ ㅉ ㅊ ㅋ ㅌ ㅍ ㅎ\nㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅗ ㅘ ㅙ ㅚ ㅛ ㅜ ㅝ ㅞ ㅟ ㅠ ㅡ ㅢ ㅣ"},
+  {"label":"분해형 진단 · 시스템 대체 글꼴 가능", "text":"NFC: 한글 각 값 / NFD: 한글 각 값"}
+]

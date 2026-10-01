@@ -31,6 +31,18 @@ files = [
 ]
 
 [[source]]
+id = "ridi-batang"
+role = "hangul-comparison-only"
+version = "1.0.1-build-20191001"
+release_page = "https://ridicorp.com/ridibatang/"
+url = "https://ridicorp.com/wp-content/themes/ridicorp/css/font/RIDIBatang.otf"
+archive = "RIDIBatang-1.0.1.otf"
+archive_format = "file"
+sha256 = "f13a49c0815d254ac15e392953a0b056613dec08ceb378e54eeed14c4fda9a54"
+license_url = "https://ridicorp.com/ridibatang/"
+files = ["RIDIBatang.otf"]
+
+[[source]]
 id = "klee-one"
 role = "japanese-candidate-a"
 version = "Version1.000"

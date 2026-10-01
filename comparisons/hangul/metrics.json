@@ -1,0 +1,54 @@
+{
+  "conditions": {
+    "style": "Regular",
+    "scale": 1.0,
+    "upm": 1000,
+    "ascii_advance": 600,
+    "hangul_advance": 1200,
+    "latin": "IBM Plex Mono 2.5.0",
+    "japanese": "IBM Plex Sans JP 3.0.0",
+    "cubic_conversion_max_error_em": 0.001
+  },
+  "fonts": {
+    "Maru": {
+      "source": "upstream/maru-buri/TTF/MaruBuri-Regular.ttf",
+      "sha256": "254abb4c131316e10a55e04495211f1df8cf68c9f58929375311a41af77c4b9b",
+      "version": "Version 2.000;hotconv 1.1.0;makeotfexe 2.6.0",
+      "source_upm": 1000,
+      "hangul_syllables": 11172,
+      "conjoining_jamo": 0,
+      "hangul_codepoints": 11223,
+      "cell_overflow_count": 0,
+      "missing_sample_codepoints": [
+        "U+1100",
+        "U+1112",
+        "U+1161",
+        "U+1173",
+        "U+11A8",
+        "U+11AB",
+        "U+11AF",
+        "U+11B9"
+      ]
+    },
+    "Ridi": {
+      "source": "upstream/ridi-batang/RIDIBatang.otf",
+      "sha256": "f13a49c0815d254ac15e392953a0b056613dec08ceb378e54eeed14c4fda9a54",
+      "version": "Version 1.0.1 Build 20191001;hotconv 1.0.109;makeotfexe 2.5.65596",
+      "source_upm": 1000,
+      "hangul_syllables": 11172,
+      "conjoining_jamo": 0,
+      "hangul_codepoints": 11266,
+      "cell_overflow_count": 0,
+      "missing_sample_codepoints": [
+        "U+1100",
+        "U+1112",
+        "U+1161",
+        "U+1173",
+        "U+11A8",
+        "U+11AB",
+        "U+11AF",
+        "U+11B9"
+      ]
+    }
+  }
+}

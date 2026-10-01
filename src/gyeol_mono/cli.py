@@ -118,7 +118,8 @@ def _print_table(plan: BuildPlan) -> None:
         powerline = "PL" if target.powerline else "base"
         print(
             f"{target.japanese_source.value:18} {powerline:4} "
-            f"{target.face.style.value:11} -> {target.names.file_name}"
+            f"{target.face.style.value:11} -> {target.names.file_name} "
+            f"(hangul: Maru Buri {target.face.hangul_source_style})"
         )
 
 

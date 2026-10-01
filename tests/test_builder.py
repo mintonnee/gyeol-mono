@@ -22,3 +22,15 @@ def test_powerline_is_patched_before_cjk_merge() -> None:
     assert target.stages.index(BuildStage.PATCH_POWERLINE) < target.stages.index(
         BuildStage.MERGE_CJK
     )
+
+
+def test_hangul_uses_maru_buri_at_the_same_weight_as_japanese() -> None:
+    targets = BuildPlan.release(JapaneseSource.IBM_PLEX_SANS_JP).targets
+    for target in targets:
+        plan = target.as_dict()
+        is_bold = target.face.output_weight == 700
+        expected = "SemiBold upright" if is_bold else "Regular upright"
+        assert plan["hangul_source"] == "maru-buri"
+        assert plan["hangul_source_weight"] == (600 if is_bold else 400)
+        assert plan["hangul_source_style"] == expected
+        assert plan["japanese_source_style"] == expected

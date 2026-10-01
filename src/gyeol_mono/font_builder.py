@@ -4,6 +4,7 @@ from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from pathlib import Path
 
+from fontTools.pens.cu2quPen import Cu2QuPen
 from fontTools.pens.transformPen import TransformPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
@@ -89,7 +90,7 @@ def build_preview_font(
         raise FontBuildError("CJK scale must be positive")
 
     latin_path = layout.font("ibm-plex-mono", _latin_file_name(target.face))
-    maru_path = layout.font("maru-buri", _maru_file_name(target.face))
+    hangul_path = layout.font("maru-buri", _maru_file_name(target.face))
     japanese_path = layout.font(
         target.japanese_source.value,
         _japanese_file_name(target.japanese_source, target.face),
@@ -101,17 +102,17 @@ def build_preview_font(
     woff2_path = ttf_path.with_suffix(".woff2")
 
     font = TTFont(latin_path, recalcBBoxes=True, recalcTimestamp=False)
-    maru = TTFont(maru_path, recalcBBoxes=False, recalcTimestamp=False)
+    hangul = TTFont(hangul_path, recalcBBoxes=False, recalcTimestamp=False)
     japanese = TTFont(japanese_path, recalcBBoxes=False, recalcTimestamp=False)
     try:
         _verify_truetype(font, "IBM Plex Mono")
-        _verify_truetype(maru, "Maru Buri")
+        _verify_outline_source(hangul, "Maru Buri")
         _verify_truetype(japanese, target.japanese_source.value)
         _verify_latin_metrics(font)
 
         hangul_count = _merge_codepoints(
             font,
-            maru,
+            hangul,
             predicate=is_hangul,
             glyph_prefix="ko",
             scale=scale,
@@ -128,7 +129,7 @@ def build_preview_font(
         font.save(ttf_path, reorderTables=False)
     finally:
         japanese.close()
-        maru.close()
+        hangul.close()
         font.close()
 
     validate_built_font(ttf_path, target)
@@ -184,7 +185,8 @@ def _merge_codepoints(
         raise FontBuildError(f"no {glyph_prefix} glyphs selected from source")
 
     destination_glyf = destination["glyf"]
-    source_glyf = source["glyf"]
+    source_glyf = source.get("glyf")
+    source_glyph_set = source.getGlyphSet() if source_glyf is None else None
     source_metrics = source["hmtx"].metrics
     target_upm = destination["head"].unitsPerEm
     source_upm = source["head"].unitsPerEm
@@ -204,7 +206,18 @@ def _merge_codepoints(
                 pen,
                 (outline_scale, 0, 0, outline_scale, x_offset, 0),
             )
-            _draw_decomposed(source_glyf, source_name, transformed_pen, stack=())
+            if source_glyf is not None:
+                _draw_decomposed(source_glyf, source_name, transformed_pen, stack=())
+            else:
+                # CFF contours have the opposite winding to TrueType contours.
+                # Approximate in source coordinates to keep the error scale-independent.
+                source_glyph_set[source_name].draw(
+                    Cu2QuPen(
+                        transformed_pen,
+                        max_err=source_upm / 1000,
+                        reverse_direction=True,
+                    )
+                )
             glyph = pen.glyph()
             destination_glyf[destination_name] = glyph
             glyph.recalcBounds(destination_glyf)
@@ -322,6 +335,11 @@ def _save_woff2(ttf_path: Path, woff2_path: Path) -> None:
 def _verify_truetype(font: TTFont, label: str) -> None:
     if "glyf" not in font or "hmtx" not in font or "cmap" not in font:
         raise FontBuildError(f"{label} must be a TrueType-flavored font")
+
+
+def _verify_outline_source(font: TTFont, label: str) -> None:
+    if not {"hmtx", "cmap"}.issubset(font.keys()) or not ("glyf" in font or "CFF " in font):
+        raise FontBuildError(f"{label} must contain TrueType or CFF outlines")
 
 
 def _verify_latin_metrics(font: TTFont) -> None:

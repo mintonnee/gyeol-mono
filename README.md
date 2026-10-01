@@ -42,10 +42,10 @@ TTF용 quadratic 윤곽으로 변환해 병합할 수 있습니다.
 
 ## 라이선스
 
-이 저장소의 빌드 스크립트·문서와 여기서 생성하는 Gyeol Mono 글꼴은
-[SIL Open Font License 1.1](LICENSE)로 배포합니다. Gyeol Mono는 아래 OFL 글꼴의
-Modified Version이므로 같은 라이선스를 그대로 따르며, 원본 저작권 고지는 `LICENSE`에
-포함되어 있습니다.
+- **소스 코드**: 빌드 스크립트·테스트·문서 등 이 저장소의 소스는 [MIT License](LICENSE)입니다.
+- **글꼴**: 여기서 생성하는 Gyeol Mono 글꼴 파일은 [SIL Open Font License 1.1](OFL.txt)입니다.
+  Gyeol Mono는 아래 OFL 글꼴의 Modified Version이므로 같은 라이선스를 그대로 따르며,
+  원본 저작권 고지는 `OFL.txt`에 포함되어 있습니다.
 
 | 원본 | 저작권자 | Reserved Font Name |
 | --- | --- | --- |
@@ -54,6 +54,6 @@ Modified Version이므로 같은 라이선스를 그대로 따르며, 원본 저
 
 - 글꼴 이름에 Reserved Font Name을 쓰지 않기 위해 패밀리 이름은 `Gyeol Mono`입니다.
   수정해 재배포할 때도 위 이름은 사용할 수 없습니다.
-- 글꼴 파일을 재배포할 때는 `LICENSE`를 함께 포함해야 하며, 글꼴만 단독으로 판매할 수 없습니다.
+- 글꼴 파일을 재배포할 때는 `OFL.txt`를 함께 포함해야 하며, 글꼴만 단독으로 판매할 수 없습니다.
 - IBM, 네이버를 비롯한 원저작자는 이 결과물을 보증하거나 후원하지 않습니다.
 - 비교 실험용 Klee One과 리디바탕도 OFL 1.1 글꼴이지만 최종 글꼴에는 포함되지 않습니다.

@@ -7,6 +7,12 @@ LATIN_ADVANCE = 600
 CJK_ADVANCE = 1_200
 CJK_GUARD = 12
 CJK_SCALE_CANDIDATES = (1.00, 1.05, 1.10, 1.15)
+# Chosen from comparisons/hangul: 1.10 scaled around the median Maru Buri syllable center.
+HANGUL_SCALE = 1.10
+HANGUL_Y_ANCHOR = 300
+# Raises Hangul against Latin; +50 made mixed Hangul and ":" look off.
+HANGUL_Y_SHIFT = 30
+JAPANESE_SCALE = 1.00
 
 
 @dataclass(frozen=True, slots=True)

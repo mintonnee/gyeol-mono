@@ -12,7 +12,8 @@ uv run gyeol-mono build
 ```
 
 기본 빌드는 `fonts/preview-b/`에 네 스타일의 TTF/WOFF2를 생성합니다.
-원본 URL·버전·SHA-256은 `sources.toml`에서 고정합니다. 한글·일본어 기본 배율은 1.00입니다.
+원본 URL·버전·SHA-256은 `sources.toml`에서 고정합니다. 한글 기본 배율은 1.10(음절 중심
+y=300 기준 확대 후 +30 unit 올림), 일본어 기본 배율은 1.00이며 `--hangul-scale`, `--japanese-scale`로 바꿀 수 있습니다.
 
 | 출력 | 영문 | 한글 | 일본어 |
 | --- | --- | --- | --- |

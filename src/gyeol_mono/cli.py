@@ -8,6 +8,7 @@ from pathlib import Path
 from gyeol_mono.builder import BuildPlan, BuildTarget
 from gyeol_mono.font_builder import SourceLayout, build_preview_font
 from gyeol_mono.japanese import FINAL_JAPANESE_SOURCE, JapaneseSource
+from gyeol_mono.metrics import HANGUL_SCALE, JAPANESE_SCALE
 from gyeol_mono.models import FACES, Style
 from gyeol_mono.upstream import fetch_source, load_manifest
 
@@ -54,7 +55,18 @@ def parser() -> argparse.ArgumentParser:
         default=[],
         help="style to build; may be repeated, defaults to all RIBBI styles",
     )
-    build.add_argument("--scale", type=float, default=1.0, help="shared CJK outline scale")
+    build.add_argument(
+        "--hangul-scale",
+        type=float,
+        default=HANGUL_SCALE,
+        help=f"Hangul outline scale around the syllable center (default {HANGUL_SCALE:.2f})",
+    )
+    build.add_argument(
+        "--japanese-scale",
+        type=float,
+        default=JAPANESE_SCALE,
+        help=f"Japanese outline scale (default {JAPANESE_SCALE:.2f})",
+    )
     return root
 
 
@@ -88,7 +100,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                     target,
                     layout=layout,
                     output_root=args.output,
-                    scale=args.scale,
+                    hangul_scale=args.hangul_scale,
+                    japanese_scale=args.japanese_scale,
                 )
                 print(
                     f"built {artifact.ttf_path} and {artifact.woff2_path} "

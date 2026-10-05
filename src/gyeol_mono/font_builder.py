@@ -12,7 +12,16 @@ from fontTools.ttLib.tables._c_m_a_p import CmapSubtable
 
 from gyeol_mono.builder import BuildTarget
 from gyeol_mono.japanese import JapaneseSource
-from gyeol_mono.metrics import CJK_ADVANCE, LATIN_ADVANCE, POWERLINE_CELL
+from gyeol_mono.metrics import (
+    CJK_ADVANCE,
+    CJK_GUARD,
+    HANGUL_SCALE,
+    HANGUL_Y_ANCHOR,
+    HANGUL_Y_SHIFT,
+    JAPANESE_SCALE,
+    LATIN_ADVANCE,
+    POWERLINE_CELL,
+)
 from gyeol_mono.models import FaceSpec
 from gyeol_mono.upstream import UpstreamManifest
 
@@ -82,11 +91,12 @@ def build_preview_font(
     *,
     layout: SourceLayout,
     output_root: Path,
-    scale: float = 1.0,
+    hangul_scale: float = HANGUL_SCALE,
+    japanese_scale: float = JAPANESE_SCALE,
 ) -> BuiltFont:
     if target.powerline or not target.preview:
         raise FontBuildError("prototype builder only supports non-Powerline preview targets")
-    if scale <= 0:
+    if hangul_scale <= 0 or japanese_scale <= 0:
         raise FontBuildError("CJK scale must be positive")
 
     latin_path = layout.font("ibm-plex-mono", _latin_file_name(target.face))
@@ -115,14 +125,16 @@ def build_preview_font(
             hangul,
             predicate=is_hangul,
             glyph_prefix="ko",
-            scale=scale,
+            scale=hangul_scale,
+            y_anchor=HANGUL_Y_ANCHOR,
+            y_shift=HANGUL_Y_SHIFT,
         )
         japanese_count = _merge_codepoints(
             font,
             japanese,
             predicate=is_japanese,
             glyph_prefix="ja",
-            scale=scale,
+            scale=japanese_scale,
         )
         _verify_glyph_inventory(font)
         _normalize_metadata(font, target)
@@ -138,7 +150,7 @@ def build_preview_font(
     return BuiltFont(target, ttf_path, woff2_path, hangul_count, japanese_count)
 
 
-def validate_built_font(path: Path, target: BuildTarget) -> None:
+def validate_built_font(path: Path, target: BuildTarget, *, check_hangul_cell: bool = True) -> None:
     font = TTFont(path, recalcTimestamp=False)
     try:
         cmap = font.getBestCmap()
@@ -154,6 +166,20 @@ def validate_built_font(path: Path, target: BuildTarget) -> None:
             glyph_name = cmap[codepoint]
             if font["hmtx"].metrics[glyph_name][0] != CJK_ADVANCE:
                 raise FontBuildError(f"{path}: U+{codepoint:04X} is not 1200 units")
+
+        for codepoint, glyph_name in cmap.items():
+            if not check_hangul_cell or not is_hangul(codepoint):
+                continue
+            glyph = font["glyf"][glyph_name]
+            if glyph.numberOfContours == 0:
+                continue
+            if (
+                glyph.xMin < CJK_GUARD
+                or glyph.xMax > CJK_ADVANCE - CJK_GUARD
+                or glyph.yMin < POWERLINE_CELL.y_min
+                or glyph.yMax > POWERLINE_CELL.y_max
+            ):
+                raise FontBuildError(f"{path}: Hangul U+{codepoint:04X} exceeds the cell")
 
         expected_italic = target.face.italic
         expected_bold = target.face.output_weight == 700
@@ -178,7 +204,13 @@ def _merge_codepoints(
     predicate: Callable[[int], bool],
     glyph_prefix: str,
     scale: float,
+    y_anchor: float = 0.0,
+    y_shift: float = 0.0,
 ) -> int:
+    """Merge scaled CJK outlines; ``y_anchor`` is the unscaled height kept fixed.
+
+    ``y_shift`` then moves the scaled outlines vertically in destination units.
+    """
     source_cmap = source.getBestCmap()
     selected = [(cp, name) for cp, name in sorted(source_cmap.items()) if predicate(cp)]
     if not selected:
@@ -191,6 +223,7 @@ def _merge_codepoints(
     target_upm = destination["head"].unitsPerEm
     source_upm = source["head"].unitsPerEm
     outline_scale = scale * target_upm / source_upm
+    y_offset = y_anchor * (1 - scale) + y_shift
     source_to_destination: dict[str, str] = {}
     cmap_additions: dict[int, str] = {}
 
@@ -204,7 +237,7 @@ def _merge_codepoints(
             pen = TTGlyphPen(None)
             transformed_pen = TransformPen(
                 pen,
-                (outline_scale, 0, 0, outline_scale, x_offset, 0),
+                (outline_scale, 0, 0, outline_scale, x_offset, y_offset),
             )
             if source_glyf is not None:
                 _draw_decomposed(source_glyf, source_name, transformed_pen, stack=())

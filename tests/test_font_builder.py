@@ -67,6 +67,28 @@ def test_consecutive_merges_keep_glyph_order_unique() -> None:
     assert len(destination.getGlyphOrder()) == len(set(destination.getGlyphOrder()))
 
 
+@pytest.mark.parametrize(
+    ("y_anchor", "y_shift", "expected"),
+    [(0.0, 0.0, (0, 770)), (350.0, 0.0, (-35, 735)), (350.0, 20.0, (-15, 755))],
+)
+def test_merge_scales_vertically_around_anchor(y_anchor, y_shift, expected) -> None:
+    destination = _font({0x41: "A"}, advance=600)
+    source = _font({0xAC00: "ga"}, advance=1_000)
+
+    _merge_codepoints(
+        destination,
+        source,
+        predicate=is_hangul,
+        glyph_prefix="ko",
+        scale=1.1,
+        y_anchor=y_anchor,
+        y_shift=y_shift,
+    )
+
+    glyph = destination["glyf"][destination.getBestCmap()[0xAC00]]
+    assert (glyph.yMin, glyph.yMax) == expected
+
+
 def _font(cmap: dict[int, str], *, advance: int):
     glyph_order = [".notdef", *cmap.values()]
     glyphs = {}
@@ -170,4 +192,29 @@ def test_preview_build_uses_maru_buri_at_the_face_weight(tmp_path, face_index):
         validate_built_font(path, target)
         with TTFont(path) as font:
             glyph = font["glyf"][font.getBestCmap()[0xAC00]]
-            assert (glyph.xMin, glyph.xMax) == (200, 600)
+            # Hangul 1.10 around y=300, then +30: x 100..500 -> 160..600, y 0..700 -> 0..770.
+            assert (glyph.xMin, glyph.xMax, glyph.yMin, glyph.yMax) == (160, 600, 0, 770)
+
+
+def test_validate_rejects_hangul_outside_cell(tmp_path):
+    from gyeol_mono.builder import BuildTarget
+    from gyeol_mono.font_builder import build_preview_font
+    from gyeol_mono.japanese import JapaneseSource
+    from gyeol_mono.models import FACES
+
+    paths = {
+        "ibm-plex-mono": _font({cp: f"g{cp}" for cp in range(32, 127)}, advance=600),
+        "maru-buri": _font({0xAC00: "ga"}, advance=1000),
+        "ibm-plex-sans-jp": _font({0x3042: "a", 0x65E5: "day"}, advance=1000),
+    }
+    for source_id, font in paths.items():
+        paths[source_id] = tmp_path / f"{source_id}.ttf"
+        font.save(paths[source_id])
+
+    class Layout:
+        def font(self, source_id, file_name):
+            return paths[source_id]
+
+    target = BuildTarget(JapaneseSource.IBM_PLEX_SANS_JP, FACES[0], False, True)
+    with pytest.raises(FontBuildError, match="exceeds the cell"):
+        build_preview_font(target, layout=Layout(), output_root=tmp_path / "out", hangul_scale=2.0)

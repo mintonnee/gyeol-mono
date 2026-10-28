@@ -326,7 +326,13 @@ CJK 병합 시 다음 테이블을 갱신해야 한다.
 - `post`: fixed-pitch 정보와 italic angle
 - `name`: 새 family, subfamily, full name, PostScript name
 
-목표 기능(현재 미구현): NFD 입력을 지원하기 위해 현대 한글 자모 시퀀스를 완성형 한글로 shaping하는 `ccmp` lookup을 제공한다. NFC `한글`과 NFD `한글`은 동일한 2셀 결과를 만들어야 한다.
+NFD 한글 지원 범위는 실환경 확인 후 결정한다(현재 미구현). 기본 방향은 NFD 자모 클러스터를 OS 글꼴 fallback에 맡기는 것이며, 다음 확인 결과가 fallback으로 충분하지 않을 때만 현대 한글 자모 시퀀스를 완성형으로 shaping하는 `ccmp` lookup을 추가한다.
+
+- NFD는 주로 macOS가 만든 파일 이름에서 유입되며, 한글 입력기로 작성한 문서와 코드는 NFC다.
+- 마루 부리에는 결합 자모 글리프가 없어 `ccmp`의 입력 글리프를 먼저 마련해야 한다. 새 자모 디자인은 3장 비목표와 충돌하고, 다른 원본의 자모는 디자인 혼용을 만든다.
+- 셀 단위로 렌더링하는 터미널은 `ccmp`를 적용하지 않을 수 있으므로 구현 효과도 환경별로 확인해야 한다.
+
+확인은 NFC/NFD 한글 문자열과 NFD 파일 이름 샘플로 Windows Terminal, IntelliJ, VS Code와 macOS Terminal.app 또는 iTerm2에서 수행한다. 각 환경에서 NFD가 (1) 같은 2셀 음절로 조합되는지, (2) 다른 글꼴로 fallback되는지, (3) 자모가 분리되거나 셀 정렬이 깨지는지 기록한다. (3)이 주요 환경에서 발생할 때만 `ccmp`와 자모 입력 글리프 확보 방식을 v1 범위에서 정한다.
 
 일본어 원본의 outline과 `cmap`은 복사하지만, monospace advance를 깨뜨릴 수 있는 `palt`, `pkna` 등의 proportional feature는 초기 버전에 포함하지 않는다. 세로쓰기용 `vert`와 `vrt2`, JP/KR glyph form 전환용 `locl`도 초기 범위에서 제외한다.
 
@@ -340,7 +346,7 @@ CJK 병합 시 다음 테이블을 갱신해야 한다.
 4. 마루 부리와 IBM Plex Sans JP 글리프 수집 및 outline decomposition
 5. 스크립트별 UPM 정규화, 확대, 중앙 정렬 및 클리핑 제한
 6. 한글·가나·한자 glyph, cmap 및 hmtx 병합
-7. NFD 한글용 `ccmp` 추가
+7. NFD 한글용 `ccmp` 추가(10장 확인 결과 필요할 때만)
 8. `Emoji_Presentation=Yes` 코드포인트 매핑과 고아 글리프 제거
 9. style bit, RIBBI 이름, 수직 메트릭 및 Unicode range 갱신
 10. IBM Plex Sans JP 기반 TTF 저장
@@ -410,7 +416,7 @@ fonts/             # gitignored
 
 ### 12.3 Shaping 검사
 
-- NFC와 NFD 한글이 동일한 시각적 음절과 advance를 생성한다.
+- NFD 한글이 자모 분리나 셀 정렬 깨짐 없이 2셀 음절로 표시된다. 다른 글꼴로의 fallback은 허용한다. `ccmp`를 구현하면 NFC와 NFD가 동일한 시각적 음절과 advance를 생성해야 한다.
 - 한영일 혼용 문장에서 셀 정렬이 유지된다.
 - IBM Plex Mono의 기존 라틴 shaping이 유지된다.
 - 일본어 proportional feature가 활성화돼 가나 또는 한자 advance가 달라지지 않는다.
@@ -521,13 +527,63 @@ Preview B에서도 Regular face의 마루 부리가 IBM Plex Mono Regular 및 IB
 
 ## 13. 재현성과 배포
 
+### 13.1 재현성
+
 - 빌드 도구와 Python 의존성 버전을 lockfile로 고정한다.
-- Nerd Fonts patcher와 glyph assets는 동일 tag 또는 commit에서 가져온다.
+- Nerd Fonts patcher와 glyph assets는 동일 tag 또는 commit에서 가져온다. CI에서는 FontForge와 patcher를 digest로 고정한 컨테이너 이미지에서 실행한다.
 - `emoji-data.txt`는 Unicode 버전을 명시한 URL과 SHA-256으로 `sources.toml`에 고정한다. Unicode 버전을 올릴 때는 제거 대상 변화를 릴리스 노트에 기록한다.
 - 빌드 시각에 따라 `head.modified`가 달라지지 않도록 재현 가능한 timestamp 정책을 사용한다.
-- 생성 폰트의 SHA-256을 릴리스 manifest에 기록한다.
-- `GyeolMono` 디렉터리와 단일 archive로 제공한다.
-- 웹 배포 시 WOFF2와 명시적인 `@font-face` CSS를 제공한다.
+- 같은 commit을 두 번 빌드하면 TTF와 WOFF2의 SHA-256이 같아야 한다. CI에서 이를 검사한다.
+- 생성 폰트의 SHA-256을 릴리스 manifest(`SHA256SUMS`)에 기록한다.
+
+### 13.2 배포 채널
+
+1차 배포 채널은 GitHub Releases, npm, GitHub Pages 세 가지다.
+
+| 채널 | 대상 | 내용 |
+| --- | --- | --- |
+| GitHub Releases | 터미널·IDE 사용자 설치 | `GyeolMono-<version>.zip`(RIBBI TTF, `licenses/`, README), `GyeolMono-<version>-web.zip`(npm과 같은 웹폰트), `SHA256SUMS` |
+| npm | 웹·문서 사이트 | unicode-range로 분할한 WOFF2, `@font-face` CSS, `OFL.txt`, 네이버 라이선스. TTF는 포함하지 않는다 |
+| GitHub Pages | 소개·specimen | 한영일 혼용 문장, 코드, Powerline 프롬프트 specimen, 설치 안내, Releases 다운로드 링크 |
+
+- GitHub Releases가 기준 산출물이다. npm과 Pages의 웹폰트는 같은 태그 빌드에서 만든 파일을 사용한다.
+- 스타일당 WOFF2가 약 2.2–2.4MB(2026-10-28 preview B)이므로 웹 배포물은 `fontTools.subset`으로 unicode-range 조각을 만들고, 브라우저가 쓰인 글자의 조각만 받게 한다. 원본 WOFF2 한 파일을 그대로 쓰는 CSS는 제공하지 않는다.
+- Pages specimen은 npm 패키지와 같은 CSS와 조각을 로드해 웹 배포물의 실사용 검증을 겸한다.
+- npm 패키지 이름에는 Reserved Font Name인 `Plex`를 쓰지 않는다.
+- Homebrew tap과 Scoop bucket은 1차 범위에서 제외하고 v1 이후 별도로 검토한다. Homebrew 공식 `homebrew-cask`는 GitHub 인지도 기준(일반 fork 30·watcher 30·star 75 중 하나, 저장소 주인 직접 제출 시 90·90·225 중 하나)이 있으므로 자체 tap부터 시작하는 것이 현실적이다.
+
+### 13.3 릴리스 절차
+
+```text
+PR / main push (ci workflow)
+  -> fetch(원본 캐시) -> pytest -> RIBBI 빌드 -> 구조 검사(12.1)
+  -> specimen PNG 렌더링 -> 폰트와 specimen을 workflow artifact로 업로드
+사람이 artifact로 12.4 시각 검사 후 승인
+  -> vX.Y.Z 태그 push (release workflow)
+  -> 같은 commit 재빌드 및 재현성 검사 -> 웹폰트 분할
+  -> GitHub Release 생성 -> npm publish -> Pages 배포
+```
+
+- 글리프 형상과 렌더링 판단은 사람이 한다. CI는 결정적으로 판정할 수 있는 구조 검사와 specimen 생성만 담당한다.
+- `upstream/archives`는 `sources.toml` 해시를 키로 캐시한다. 외부 배포처가 일시 장애여도 고정 SHA-256 검증은 매번 수행한다.
+- npm은 GitHub Actions OIDC trusted publishing으로 provenance와 함께 배포하고 장기 token을 저장소 secret에 두지 않는다.
+- Pages는 태그 릴리스에서만 배포해 사이트가 항상 최신 릴리스와 일치하게 한다.
+- 태그 버전을 `name` ID 5(`Version x.yyy`)와 `head.fontRevision`에 반영한다. 현재 빌더는 ID 3에 `0.1.0`을 고정하고 ID 5와 `fontRevision`을 IBM Plex Mono 값 그대로 두므로 v1 전에 바꿔야 한다.
+
+### 13.4 v1 선행 작업
+
+1. 이름이 `Gyeol Mono`인 release target 빌드 경로(현재 빌더는 preview target만 허용)
+2. 태그 기반 버전 메타데이터
+3. 9장 Powerline patch 단계 구현
+4. `ots-sanitize`, `fontbakery check-universal` 검사 추가
+5. 14장 `licenses/` 구성, archive와 `SHA256SUMS` 생성
+6. 웹폰트 unicode-range 분할과 CSS 생성
+7. ci, release workflow와 Pages specimen
+8. 10장 NFD 한글 실환경 확인과 `ccmp` 필요 여부 결정
+9. 12.6 Regular 한글 굵기 보정(H3) 비교와 채택 여부 결정
+10. 6장 전각/반각 및 중복 기호 allowlist 확정
+
+v1은 일정보다 완성도를 우선한다. 8–10번도 v1 범위에 포함하며, 글리프 품질 항목(8–10, 3)을 먼저 확정한 뒤 릴리스 인프라(1, 2, 4–7)를 마무리한다.
 
 ## 14. 라이선스와 저작권 고지
 
@@ -561,6 +617,10 @@ licenses/
 - 전각/반각 및 중복 기호 allowlist
 - 전체 Nerd Fonts 아이콘을 담은 별도 `Gyeol Mono NF` 패밀리 제공 여부. 제공한다면 IBM Plex Mono에 먼저 패치하는 9.2 순서와 6.1 emoji 제외를 그대로 적용하고, 아이콘 시각 폭 정책과 PUA의 East Asian Width(Ambiguous) 안내를 함께 정한다
 - 고정할 Nerd Fonts tag
+- NFD 한글 `ccmp` 구현 여부와 자모 입력 글리프 확보 방식(10장 실환경 확인 후 결정)
+- npm 패키지 이름(비scope 또는 scope)과 GitHub Pages 주소
+- 웹폰트 unicode-range 분할 기준(조각 수, 한글 빈도순 여부)
+- SemVer 태그를 `Version x.yyy`와 `head.fontRevision`으로 옮기는 규칙
 - 향후 JP/KR `locl` glyph form 지원 여부
 - 향후 synthetic CJK italic 실험 여부
 
@@ -585,3 +645,5 @@ licenses/
 - `Emoji_Presentation=Yes` 코드포인트는 원본과 무관하게 최종 글꼴에서 제외하고 OS emoji 글꼴 fallback에 맡긴다. text presentation 기호는 유지한다.
 - IBM Plex Mono의 `U+274C` 흑백 X 윤곽은 `U+2717`(✗)로 옮겨 ✓/✗ 짝을 유지한다.
 - 초기 출력은 TTF와 WOFF2로 제한한다.
+- NFD 한글은 OS 글꼴 fallback을 기본으로 하고, 실환경에서 자모 분리나 셀 깨짐이 확인될 때만 `ccmp`를 추가한다.
+- 1차 배포 채널은 GitHub Releases, npm(분할 WOFF2와 CSS), GitHub Pages이며 태그 workflow 하나에서 함께 배포한다. Homebrew tap과 Scoop bucket은 v1 이후 검토한다.

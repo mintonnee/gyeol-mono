@@ -41,9 +41,8 @@ uv run ruff check src tests scripts
 JSON의 `hangul_source_style`과 `japanese_source_style`로 스크립트별 원본 스타일을
 확인할 수 있습니다.
 
-리디바탕은 `sources.toml`에 비교 재현용으로만 남겨 두었습니다. CFF 윤곽 입력은
-TTF용 quadratic 윤곽으로 변환해 병합할 수 있습니다.
-마루 부리/리디바탕 한글 비교 페이지의 재생성 방법은 `comparisons/hangul/README.md`,
+CFF 윤곽 입력은 TTF용 quadratic 윤곽으로 변환해 병합할 수 있습니다.
+마루 부리 한글 배율 비교 페이지의 재생성 방법은 `comparisons/hangul/README.md`,
 상세 설계와 이전 실험 기록은 `docs/specs/001-build-display-serif-mono.md`를 참조하세요.
 
 ## 라이선스
@@ -62,4 +61,3 @@ TTF용 quadratic 윤곽으로 변환해 병합할 수 있습니다.
   수정해 재배포할 때도 위 이름은 사용할 수 없습니다.
 - 글꼴 파일을 재배포할 때는 `OFL.txt`를 함께 포함해야 하며, 글꼴만 단독으로 판매할 수 없습니다.
 - IBM, 네이버를 비롯한 원저작자는 이 결과물을 보증하거나 후원하지 않습니다.
-- 비교 실험용 Klee One과 리디바탕도 OFL 1.1 글꼴이지만 최종 글꼴에는 포함되지 않습니다.

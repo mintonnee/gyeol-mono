@@ -4,11 +4,7 @@ import argparse
 import csv
 import json
 from pathlib import Path
-from urllib.request import urlopen
 
-from fontTools.fontBuilder import FontBuilder
-from fontTools.pens.cu2quPen import Cu2QuPen
-from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 
 from gyeol_mono.builder import BuildTarget
@@ -26,48 +22,15 @@ from gyeol_mono.metrics import CJK_ADVANCE, CJK_GUARD, CJK_SCALE_CANDIDATES, HAN
 from gyeol_mono.models import FACES
 from gyeol_mono.upstream import load_manifest, sha256
 
-RIDI_URL = "https://ridicorp.com/wp-content/themes/ridicorp/css/font/RIDIBatang.otf"
-RIDI_SHA256 = "f13a49c0815d254ac15e392953a0b056613dec08ceb378e54eeed14c4fda9a54"
 OUTPUT = Path("comparisons/hangul")
 CENTERED_SCALES = (1.10, 1.15)
 # Raising Hangul by N units equals lowering Latin by N relative to it.
 HANGUL_Y_SHIFTS = (10, 20, 30, 40, 50)
 
 
-def quadratic_hangul(font):
-    """Convert only selected CFF outlines, at 1/1000 em error, for the existing merger."""
-    cmap = {cp: name for cp, name in font.getBestCmap().items() if is_hangul(cp)}
-    order = [".notdef", *sorted(set(cmap.values()) - {".notdef"})]
-    glyphs = {}
-    glyph_set = font.getGlyphSet()
-    for name in order:
-        pen = TTGlyphPen(None)
-        glyph_set[name].draw(Cu2QuPen(pen, font["head"].unitsPerEm / 1000, reverse_direction=True))
-        glyphs[name] = pen.glyph()
-    builder = FontBuilder(font["head"].unitsPerEm, isTTF=True)
-    builder.setupGlyphOrder(order)
-    builder.setupCharacterMap(cmap)
-    builder.setupGlyf(glyphs)
-    builder.setupHorizontalMetrics({name: font["hmtx"][name] for name in order})
-    return builder.font
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--fetch-ridi", action="store_true", help="also add RIDIBatang at 1.00")
-    args = parser.parse_args()
-    ridi_path = Path("upstream/ridi-batang/RIDIBatang.otf")
-    if args.fetch_ridi and not ridi_path.exists():
-        ridi_path.parent.mkdir(parents=True, exist_ok=True)
-        with urlopen(RIDI_URL, timeout=60) as response:
-            data = response.read()
-        import hashlib
-
-        if hashlib.sha256(data).hexdigest() != RIDI_SHA256:
-            raise ValueError("RIDI download checksum mismatch")
-        ridi_path.write_bytes(data)
-    if ridi_path.exists() and sha256(ridi_path) != RIDI_SHA256:
-        raise ValueError("RIDI checksum mismatch")
+    parser.parse_args()
 
     OUTPUT.mkdir(parents=True, exist_ok=True)
     layout = SourceLayout(load_manifest(Path("sources.toml")), Path("upstream"))
@@ -87,7 +50,6 @@ def main():
             "hangul_guard": CJK_GUARD,
             "latin": "IBM Plex Mono 2.5.0",
             "japanese": "IBM Plex Sans JP 3.0.0",
-            "cubic_conversion_max_error_em": 0.001,
         },
         "fonts": {},
     }
@@ -110,8 +72,6 @@ def main():
         (f"Maru110CU{shift}", "마루 부리 · 한글 올림", maru_path, 1.10, HANGUL_Y_ANCHOR, shift)
         for shift in HANGUL_Y_SHIFTS
     ]
-    if ridi_path.exists():
-        variants.append(("Ridi100", "리디바탕", ridi_path, 1.0, 0, 0))
     sample_texts = json.loads((OUTPUT / "samples.json").read_text(encoding="utf-8"))
     rows = []
     for label, title, path, scale, y_anchor, y_shift in variants:
@@ -119,10 +79,9 @@ def main():
         summary["conditions"]["hangul_y_anchors"][label] = y_anchor
         summary["conditions"]["hangul_y_shifts"][label] = y_shift
         with TTFont(path) as original, TTFont(latin_path) as font, TTFont(jp_path) as jp:
-            source = quadratic_hangul(original) if "CFF " in original else original
             _merge_codepoints(
                 font,
-                source,
+                original,
                 predicate=is_hangul,
                 glyph_prefix="ko",
                 scale=scale,
@@ -200,8 +159,6 @@ def main():
                     if cp not in c
                 ],
             }
-            if source is not original:
-                source.close()
     (OUTPUT / "metrics.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )

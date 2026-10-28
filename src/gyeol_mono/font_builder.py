@@ -17,7 +17,7 @@ from gyeol_mono.emoji import (
     TEXT_PRESENTATION_ALIASES,
     load_emoji_presentation,
 )
-from gyeol_mono.japanese import JapaneseSource
+from gyeol_mono.japanese import JapaneseSource, candidate
 from gyeol_mono.metrics import (
     CJK_ADVANCE,
     CJK_GUARD,
@@ -503,12 +503,11 @@ def _maru_file_name(face: FaceSpec) -> str:
 
 def _japanese_file_name(source: JapaneseSource, face: FaceSpec) -> str:
     weight = "Regular" if face.source_weight == 400 else "SemiBold"
-    prefix = "KleeOne" if source is JapaneseSource.KLEE_ONE else "IBMPlexSansJP"
-    return f"{prefix}-{weight}.ttf"
+    return f"IBMPlexSansJP-{weight}.ttf"
 
 
 def _preview_label(source: JapaneseSource) -> str:
-    return "A" if source is JapaneseSource.KLEE_ONE else "B"
+    return candidate(source).preview_label
 
 
 def _in_ranges(codepoint: int, ranges: Iterable[tuple[int, int]]) -> bool:

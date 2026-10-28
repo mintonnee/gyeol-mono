@@ -22,7 +22,7 @@ def parser() -> argparse.ArgumentParser:
     plan.add_argument(
         "--release-source",
         choices=[source.value for source in JapaneseSource],
-        help="emit a 4-target release plan instead of the 8-target preview plan",
+        help="emit the release plan with final names instead of the preview plan",
     )
     plan.add_argument("--json", action="store_true", help="emit machine-readable JSON")
 

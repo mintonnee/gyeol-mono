@@ -21,18 +21,10 @@ def test_project_manifest_pins_all_canonical_sources() -> None:
     assert {source.id for source in manifest.sources} == {
         "ibm-plex-mono",
         "maru-buri",
-        "ridi-batang",
-        "klee-one",
         "ibm-plex-sans-jp",
         "unicode-emoji-data",
     }
-    klee = manifest.select(("klee-one",))[0]
-    assert klee.revision == "8b0532731b63ad8a445ca341d8d7d941079b83ab"
     assert all(len(source.sha256) == 64 for source in manifest.sources)
-    ridi = manifest.select(("ridi-batang",))[0]
-    assert ridi.role == "hangul-comparison-only"
-    assert ridi.archive_format == "file"
-    assert ridi.files == ("RIDIBatang.otf",)
     assert manifest.select(("maru-buri",))[0].role == "hangul"
     emoji = manifest.select(("unicode-emoji-data",))[0]
     assert emoji.archive_format == "file"

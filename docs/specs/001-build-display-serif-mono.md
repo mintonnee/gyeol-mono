@@ -35,12 +35,11 @@
 - Variable Font
 - 한글 및 일본어 글리프의 synthetic italic 또는 oblique
 - ExtraLight, Light, Medium, SemiBold, ExtraBold 등 별도 사용자 노출 웨이트
-- Klee One과 IBM Plex Sans JP를 한 최종 패밀리 안에서 혼합해 사용하는 구성
 - CJK 언어 태그에 따른 JP/KR `locl` 전환
 - CFF outline 기반 OTF 출력 (CFF 입력은 지원)
 - 원본 폰트의 소스 편집 또는 새로운 글리프 디자인
 
-초기 출력 포맷은 TTF와 WOFF2로 제한한다. 한글 원본이 CFF 윤곽(예: 비교용 리디바탕 OTF)이면 0.001 em 허용 근사 오차로 quadratic으로 변환하고 TrueType 방향으로 반전한다. 원본 한글 힌팅은 가져오지 않는다.
+초기 출력 포맷은 TTF와 WOFF2로 제한한다. 한글 원본이 CFF 윤곽이면 0.001 em 허용 근사 오차로 quadratic으로 변환하고 TrueType 방향으로 반전한다. 원본 한글 힌팅은 가져오지 않는다.
 
 ## 4. 원본과 버전 고정
 
@@ -50,15 +49,13 @@
 | --- | --- | --- | --- |
 | 라틴 및 기본 OpenType 테이블 | [IBM Plex Mono 2.5.0](https://github.com/IBM/plex/releases/tag/%40ibm%2Fplex-mono%402.5.0) | `ibm-plex-mono.zip` | `6d23f01257663d8cc49a0d64c22ced630b79e0e2a0ac08a0da86e9a38bbc481c` |
 | 한글 및 한글 전각 문장부호 | [마루 부리 2022 완성본](https://hangeul.naver.com/font) | `maruburi.zip` | `39e3bb6a00b4543563a745195a6a89282c5a1f0f8b71923ff15c1bc7c135fa0c` |
-| 한글 비교 실험 | [리디바탕 1.0.1 Build 20191001](https://ridicorp.com/ridibatang/) | `RIDIBatang.otf` | `f13a49c0815d254ac15e392953a0b056613dec08ceb378e54eeed14c4fda9a54` |
-| 비교 실험 A | [Klee One Version1.000](https://github.com/fontworks-fonts/Klee/releases/tag/Version1.000) | commit `8b0532731b63ad8a445ca341d8d7d941079b83ab` ZIP | `4ca4e5d364fa28a8035e0041d94feb745b4104cfda828d42b5d0d8f13bae83c7` |
-| 일본어 원본 확정안 B | [IBM Plex Sans JP 3.0.0](https://github.com/IBM/plex/releases/tag/%40ibm%2Fplex-sans-jp%403.0.0) | `ibm-plex-sans-jp.zip` | `4c14c41552934b0bc92fc216a76b36bdc78f745dfbeed1115f9b8bc405ee314f` |
+| 일본어 | [IBM Plex Sans JP 3.0.0](https://github.com/IBM/plex/releases/tag/%40ibm%2Fplex-sans-jp%403.0.0) | `ibm-plex-sans-jp.zip` | `4c14c41552934b0bc92fc216a76b36bdc78f745dfbeed1115f9b8bc405ee314f` |
 | Powerline 글리프 | Nerd Fonts Font Patcher에 포함된 Powerline/Powerline Extra | Font Patcher 입력 자산 | Nerd Fonts 버전 결정 후 추가 |
 | Emoji presentation 판정 | [Unicode 18.0.0](https://www.unicode.org/versions/Unicode18.0.0/) `emoji-data.txt` | `emoji-data-18.0.0.txt` | `80d00f8e616a0ef27fd6b8de3b758c06383b5d917e2977709578e68baf733bf1` |
 
-IBM Plex Mono에서는 complete TTF의 Regular, Italic, SemiBold, SemiBold Italic을 사용한다. IBM Plex Sans JP에서는 outline 변환 후 무효가 되는 힌팅을 가져오지 않도록 unhinted complete TTF의 Regular와 SemiBold를 사용한다. 마루 부리와 Klee One에서도 Regular와 SemiBold TTF만 추출한다.
+IBM Plex Mono에서는 complete TTF의 Regular, Italic, SemiBold, SemiBold Italic을 사용한다. IBM Plex Sans JP에서는 outline 변환 후 무효가 되는 힌팅을 가져오지 않도록 unhinted complete TTF의 Regular와 SemiBold를 사용한다. 마루 부리에서도 Regular와 SemiBold TTF만 추출한다.
 
-Klee의 `Version1.000`은 별도 GitHub Release asset이 아니라 태그이므로 태그가 가리키는 commit `8b0532731b63ad8a445ca341d8d7d941079b83ab`의 codeload ZIP을 고정한다. 마루 부리 ZIP에는 라이선스 파일이 포함되어 있지 않으므로 배포 패키지를 만들 때 [네이버 라이선스 전문](https://help.naver.com/service/30016/contents/18088?osType=PC&lang=ko)을 별도로 포함한다. 리디바탕은 비교 재현용 소스로만 보존한다. ZIP이 아닌 단일 파일이며 `archive_format = "file"`로 선언하고, 공식 URL의 내용이 바뀌면 SHA-256 검증에서 중단한다.
+마루 부리 ZIP에는 라이선스 파일이 포함되어 있지 않으므로 배포 패키지를 만들 때 [네이버 라이선스 전문](https://help.naver.com/service/30016/contents/18088?osType=PC&lang=ko)을 별도로 포함한다. `emoji-data.txt`처럼 ZIP이 아닌 단일 파일은 `archive_format = "file"`로 선언하고, 공식 URL의 내용이 바뀌면 SHA-256 검증에서 중단한다.
 
 다운로더는 `sources.toml`의 URL 및 SHA-256을 검증하고 선언된 파일만 `upstream/` 아래에 추출한다. `latest` URL을 빌드 입력으로 직접 사용하면 안 된다. 원본 파일과 생성 파일은 Git에서 제외하고 manifest만 추적한다.
 
@@ -67,9 +64,6 @@ Klee의 `Version1.000`은 별도 GitHub Release asset이 아니라 태그이므�
 - [IBM Plex](https://github.com/IBM/plex)
 - [IBM Plex 라이선스](https://github.com/IBM/plex/blob/master/LICENSE.txt)
 - [네이버 글꼴 모음 및 마루 부리 사용 안내](https://hangeul.naver.com/font)
-- [리디바탕 공식 배포 및 라이선스 안내](https://ridicorp.com/ridibatang/)
-- [Klee One 메타데이터](https://github.com/google/fonts/blob/main/ofl/kleeone/METADATA.pb)
-- [Klee One 설명](https://github.com/google/fonts/blob/main/ofl/kleeone/DESCRIPTION.en_us.html)
 - [IBM Plex Sans JP 메타데이터](https://github.com/google/fonts/blob/main/ofl/ibmplexsansjp/METADATA.pb)
 - [Nerd Fonts Font Patcher](https://github.com/ryanoasis/nerd-fonts#font-patcher)
 - [Nerd Fonts Glyph Sets and Code Points](https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points)
@@ -102,7 +96,7 @@ OpenType family name은 플랫폼 호환성을 위해 ASCII `Gyeol Mono`를 사�
 
 `name` ID 1과 16은 `Gyeol Mono`로 통일한다. ID 2와 17은 `Regular`, `Italic`, `Bold`, `Bold Italic` 중 해당 값을 사용한다. ID 4와 6은 위 표의 Full/PostScript name을 사용한다.
 
-후보 비교 빌드는 동시에 설치해 비교할 수 있도록 사용자 노출 family를 `Gyeol Mono Preview A`와 `Gyeol Mono Preview B`로 분리했다. manifest에서 Preview A는 Klee One, Preview B는 IBM Plex Sans JP에 대응한다. 비교 결과 B안을 확정했으며 최종 릴리스에는 Preview 이름이나 Klee One 글리프를 포함하지 않는다.
+후보 비교 빌드는 동시에 설치해 비교할 수 있도록 사용자 노출 family를 `Gyeol Mono Preview A`(Klee One)와 `Gyeol Mono Preview B`(IBM Plex Sans JP)로 분리했다. B안을 확정한 뒤 Klee One은 저장소에서 제거했고(12.11), 현재 preview 빌드는 이미 설치된 시험용 글꼴과 이어지도록 `Gyeol Mono Preview B` 이름을 유지한다. 최종 릴리스에는 Preview 이름을 사용하지 않는다.
 
 ### 5.2 웨이트 및 스타일 매트릭스
 
@@ -488,11 +482,11 @@ Preview B에서도 Regular face의 마루 부리가 IBM Plex Mono Regular 및 IB
 
 ### 12.7 리디바탕 시안 (2026-09-24, 철회됨)
 
-동일한 라틴·일본어와 scale 1.00에서 마루 부리와 리디바탕을 비교한 뒤 리디바탕을 한글 원본으로 선택해 preview를 빌드했다. 리디바탕은 Regular 한 굵기만 제공하므로 이 시안에서는 RIBBI 전체가 Regular 한글을 사용했고 Bold 한글의 별도 굵기가 없었다. 비교 페이지와 재생성 방법은 `comparisons/hangul/`에 남아 있다.
+동일한 라틴·일본어와 scale 1.00에서 마루 부리와 리디바탕을 비교한 뒤 리디바탕을 한글 원본으로 선택해 preview를 빌드했다. 리디바탕은 Regular 한 굵기만 제공하므로 이 시안에서는 RIBBI 전체가 Regular 한글을 사용했고 Bold 한글의 별도 굵기가 없었다. 리디바탕 원본 고정과 비교 시안은 2026-10-28에 저장소에서 제거했다(12.11).
 
 ### 12.8 마루 부리 재확정 (2026-10-01)
 
-리디바탕 시안을 실제 폰트로 빌드해 사용해 본 뒤, 사용자가 한글 베이스로 마루 부리가 더 낫다고 판단해 마루 부리를 한글 원본으로 되돌렸다. Regular/Italic은 마루 부리 Regular, Bold/Bold Italic은 마루 부리 SemiBold를 사용하므로 Bold 한글의 강조 차이가 복원된다. 리디바탕은 `sources.toml`에 `hangul-comparison-only` 역할로만 남기며, 이때 추가한 단일 파일 다운로드와 CFF 입력 변환은 범용 기능으로 유지한다. 12.6의 Regular 굵기 보정(H0–H3)은 다시 미결 과제다. 현재 구현 범위는 non-Powerline preview TTF/WOFF2이며, PL 및 NFD shaping은 기존대로 미구현이다.
+리디바탕 시안을 실제 폰트로 빌드해 사용해 본 뒤, 사용자가 한글 베이스로 마루 부리가 더 낫다고 판단해 마루 부리를 한글 원본으로 되돌렸다. Regular/Italic은 마루 부리 Regular, Bold/Bold Italic은 마루 부리 SemiBold를 사용하므로 Bold 한글의 강조 차이가 복원된다. 이때 추가한 단일 파일 다운로드와 CFF 입력 변환은 범용 기능으로 유지한다. 12.6의 Regular 굵기 보정(H0–H3)은 다시 미결 과제다. 현재 구현 범위는 non-Powerline preview TTF/WOFF2이며, PL 및 NFD shaping은 기존대로 미구현이다.
 
 ### 12.9 한글 배율 확정 (2026-10-05)
 
@@ -524,6 +518,16 @@ Preview B에서도 Regular face의 마루 부리가 IBM Plex Mono Regular 및 IB
 2026-10-28에 배포 파일을 직접 확인한 결과, JetBrains Mono 2.304 Regular는 기본 패밀리에 Powerline Core 7자를 포함한다. Cascadia Code 2407.24는 기본 패밀리에는 Powerline이 없고 `PL`(38자)과 `NF`(41자) 변형에만 포함하며, Roboto Mono는 포함하지 않는다. Cascadia처럼 `PL` 이름을 분리하는 사례도 있지만, 이 프로젝트에는 기존 PUA 글리프와의 충돌이 없어 분리로 얻는 이점이 작다.
 
 같은 날 6.1의 emoji 제외 정책을 추가했다. 컬러 emoji는 플랫폼마다 포맷(COLR/CPAL, sbix, CBDT)이 다르고, 수록하면 글꼴 크기가 크게 늘어나며, ZWJ 시퀀스 셀 폭은 글꼴이 통제할 수 없어 OS fallback이 낫다고 판단했다. 전체 Nerd Fonts 아이콘은 eza 등에서 필요한 Material Design 세트가 대부분을 차지해 부분 세트의 이점이 작으므로, 넣는다면 별도 패밀리로 전체 세트를 제공하는 방안을 15장에서 결정한다.
+
+### 12.11 비교 원본 제거 (2026-10-28)
+
+일본어 원본(IBM Plex Sans JP)과 한글 원본(마루 부리)이 확정되어 비목표가 된 비교 원본을 저장소에서 제거했다.
+
+- `sources.toml`에서 `klee-one`, `ridi-batang` 항목을 지웠다.
+- `JapaneseSource`에는 IBM Plex Sans JP만 남아 preview 빌드 행렬이 4개 target이 된다.
+- `scripts/compare_hangul.py`의 리디바탕 참고 시안과 `comparisons/hangul/metrics.json`의 `Ridi100` 기록을 지웠다.
+- 12.5–12.8의 비교 결과는 결정 근거로 남긴다. 당시 원본의 버전과 SHA-256은 Git 기록에서 확인할 수 있다.
+- 단일 파일 다운로드(`archive_format = "file"`)와 CFF 윤곽 입력 변환은 범용 기능으로 유지한다.
 
 ## 13. 재현성과 배포
 
@@ -589,8 +593,7 @@ v1은 일정보다 완성도를 우선한다. 8–10번도 v1 범위에 포함�
 
 - IBM Plex는 SIL Open Font License 1.1을 사용하며 `Plex`는 Reserved Font Name이다.
 - 최종 family name에는 `Plex`를 사용하지 않는다.
-- 마루 부리는 수정과 재배포가 허용되지만 네이버와 네이버문화재단의 저작권 안내 및 라이선스 전문을 포함해야 한다. 리디바탕(SIL OFL 1.1)을 담는 비교 패키지에만 리디주식회사 고지가 필요하다.
-- Klee One은 SIL Open Font License 1.1이며, 후보 비교 및 Klee 기반 결과물에는 원본 저작권 고지를 포함한다.
+- 마루 부리는 수정과 재배포가 허용되지만 네이버와 네이버문화재단의 저작권 안내 및 라이선스 전문을 포함해야 한다.
 - IBM Plex Sans JP는 SIL Open Font License 1.1이며, IBM Plex Mono와 동일하게 최종 family name에서 `Plex`를 사용하지 않는다.
 - Powerline 자산을 기본 포함하므로 `Gyeol Mono` 배포물에 Nerd Fonts 및 해당 glyph source의 라이선스 고지를 추가한다.
 - `emoji-data.txt`는 빌드 입력으로만 사용하고 글꼴이나 배포물에 포함하지 않는다.
@@ -603,11 +606,10 @@ licenses/
   OFL-1.1.txt
   IBM-PLEX-NOTICE.txt
   NAVER-FONTS-LICENSE.txt
-  KLEE-ONE-OFL.txt
   NERD-FONTS-LICENSE.txt
 ```
 
-후보 비교 archive에는 두 일본어 후보의 고지를 모두 포함한다. 공개 릴리스 archive에는 IBM Plex Sans JP의 고지만 포함하고 Klee One 고지는 포함하지 않는다. 공개 릴리스 전에 결합 결과물에 적용되는 라이선스 조합과 고지 문구를 최종 검토한다.
+공개 릴리스 전에 결합 결과물에 적용되는 라이선스 조합과 고지 문구를 최종 검토한다.
 
 ## 15. 미결정 사항
 
@@ -629,8 +631,8 @@ licenses/
 - 라틴은 600, 한글·가나·한자는 1,200의 duospace 구조를 사용한다.
 - 한글은 마루 부리 upright outline을 확대·중앙 정렬해 사용한다.
 - 동일 조건의 Preview A/B 비교 결과 최종 일본어 원본은 IBM Plex Sans JP로 확정한다.
-- Klee One은 비교 실험 기록으로만 유지하고 최종 릴리스에는 포함하지 않는다.
-- 리디바탕 시안을 철회하고 마루 부리를 한글 원본으로 재확정한다. 리디바탕은 비교 실험 기록으로만 유지한다.
+- 리디바탕 시안을 철회하고 마루 부리를 한글 원본으로 재확정한다.
+- Klee One과 리디바탕은 비교 결과만 기록으로 남기고 원본 고정, 빌드 경로와 비교 시안은 저장소에서 제거한다.
 - 마루 부리 Regular의 굵기 보정은 H0–H3 후속 비교로 결정하며 정적 Regular/SemiBold outline의 직접 보간은 사용하지 않는다.
 - 한글 기본 배율은 1.10, 수직 anchor는 y=300, 수직 이동은 +30이며 Regular와 Bold에 같이 적용한다. 일본어 배율은 1.00이다.
 - 최종 family name은 `Gyeol Mono` 하나이며 `PL` 패밀리는 만들지 않는다.

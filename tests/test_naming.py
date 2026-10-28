@@ -12,10 +12,9 @@ def test_release_bold_italic_names() -> None:
     assert names.file_name == "GyeolMono-BoldItalic.ttf"
 
 
-def test_preview_names_can_be_installed_side_by_side() -> None:
-    klee = names_for(Style.REGULAR, preview_source=JapaneseSource.KLEE_ONE)
-    plex = names_for(Style.REGULAR, preview_source=JapaneseSource.IBM_PLEX_SANS_JP)
+def test_preview_names_can_be_installed_beside_release() -> None:
+    preview = names_for(Style.REGULAR, preview_source=JapaneseSource.IBM_PLEX_SANS_JP)
+    release = names_for(Style.REGULAR)
 
-    assert klee.family == "Gyeol Mono Preview A"
-    assert plex.family == "Gyeol Mono Preview B"
-    assert klee.postscript_name != plex.postscript_name
+    assert preview.family == "Gyeol Mono Preview B"
+    assert preview.postscript_name != release.postscript_name

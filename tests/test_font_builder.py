@@ -192,7 +192,6 @@ def test_preview_build_uses_maru_buri_at_the_face_weight(tmp_path, face_index):
     artifact = build_preview_font(target, layout=Layout(), output_root=tmp_path / "out")
     weight = "SemiBold" if face.output_weight == 700 else "Regular"
     assert ("maru-buri", f"MaruBuri-{weight}.ttf") in calls
-    assert not any(source == "ridi-batang" for source, _ in calls)
     assert artifact.hangul_glyphs == 1
     for path in (artifact.ttf_path, artifact.woff2_path):
         validate_built_font(path, target, emoji_presentation=frozenset({0x274C}))

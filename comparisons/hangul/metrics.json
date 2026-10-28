@@ -12,8 +12,7 @@
       "Maru110CU20": 1.1,
       "Maru110CU30": 1.1,
       "Maru110CU40": 1.1,
-      "Maru110CU50": 1.1,
-      "Ridi100": 1.0
+      "Maru110CU50": 1.1
     },
     "hangul_y_anchors": {
       "Maru100": 0,
@@ -26,8 +25,7 @@
       "Maru110CU20": 300,
       "Maru110CU30": 300,
       "Maru110CU40": 300,
-      "Maru110CU50": 300,
-      "Ridi100": 0
+      "Maru110CU50": 300
     },
     "hangul_y_shifts": {
       "Maru100": 0,
@@ -40,16 +38,14 @@
       "Maru110CU20": 20,
       "Maru110CU30": 30,
       "Maru110CU40": 40,
-      "Maru110CU50": 50,
-      "Ridi100": 0
+      "Maru110CU50": 50
     },
     "upm": 1000,
     "ascii_advance": 600,
     "hangul_advance": 1200,
     "hangul_guard": 12,
     "latin": "IBM Plex Mono 2.5.0",
-    "japanese": "IBM Plex Sans JP 3.0.0",
-    "cubic_conversion_max_error_em": 0.001
+    "japanese": "IBM Plex Sans JP 3.0.0"
   },
   "fonts": {
     "Maru100": {
@@ -338,33 +334,6 @@
       "guard_violation_count": 0,
       "syllable_ink_width_median": 933,
       "syllable_ink_width_max": 1064,
-      "missing_sample_codepoints": [
-        "U+1100",
-        "U+1112",
-        "U+1161",
-        "U+1173",
-        "U+11A8",
-        "U+11AB",
-        "U+11AF",
-        "U+11B9"
-      ]
-    },
-    "Ridi100": {
-      "title": "리디바탕",
-      "scale": 1.0,
-      "y_anchor": 0,
-      "y_shift": 0,
-      "source": "upstream/ridi-batang/RIDIBatang.otf",
-      "sha256": "f13a49c0815d254ac15e392953a0b056613dec08ceb378e54eeed14c4fda9a54",
-      "version": "Version 1.0.1 Build 20191001;hotconv 1.0.109;makeotfexe 2.5.65596",
-      "source_upm": 1000,
-      "hangul_syllables": 11172,
-      "conjoining_jamo": 0,
-      "hangul_codepoints": 11266,
-      "cell_overflow_count": 0,
-      "guard_violation_count": 1,
-      "syllable_ink_width_median": 841,
-      "syllable_ink_width_max": 933,
       "missing_sample_codepoints": [
         "U+1100",
         "U+1112",

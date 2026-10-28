@@ -2,11 +2,11 @@ from gyeol_mono.builder import BuildPlan, BuildStage
 from gyeol_mono.japanese import JapaneseSource
 
 
-def test_preview_plan_contains_eight_unique_targets() -> None:
+def test_preview_plan_contains_four_unique_targets() -> None:
     plan = BuildPlan.preview()
 
-    assert len(plan.targets) == 8
-    assert len({target.names.file_name for target in plan.targets}) == 8
+    assert len(plan.targets) == 4
+    assert len({target.names.file_name for target in plan.targets}) == 4
 
 
 def test_release_plan_contains_four_targets_without_preview_or_pl_names() -> None:

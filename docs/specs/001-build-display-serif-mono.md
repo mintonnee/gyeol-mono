@@ -371,6 +371,10 @@ tests/test_shaping.py
 tests/test_japanese.py
 tests/test_powerline.py
 tests/test_emoji.py
+site/index.html.j2
+site/samples.json
+mise.toml
+mise.lock
 specimens/
 licenses/
 upstream/          # gitignored
@@ -533,7 +537,7 @@ Preview B에서도 Regular face의 마루 부리가 IBM Plex Mono Regular 및 IB
 
 ### 13.1 재현성
 
-- 빌드 도구와 Python 의존성 버전을 lockfile로 고정한다.
+- 빌드 도구와 Python 의존성 버전을 lockfile로 고정한다(13.5).
 - Nerd Fonts patcher와 glyph assets는 동일 tag 또는 commit에서 가져온다. CI에서는 FontForge와 patcher를 digest로 고정한 컨테이너 이미지에서 실행한다.
 - `emoji-data.txt`는 Unicode 버전을 명시한 URL과 SHA-256으로 `sources.toml`에 고정한다. Unicode 버전을 올릴 때는 제거 대상 변화를 릴리스 노트에 기록한다.
 - 빌드 시각에 따라 `head.modified`가 달라지지 않도록 재현 가능한 timestamp 정책을 사용한다.
@@ -582,12 +586,45 @@ PR / main push (ci workflow)
 4. `ots-sanitize`, `fontbakery check-universal` 검사 추가
 5. 14장 `licenses/` 구성, archive와 `SHA256SUMS` 생성
 6. 웹폰트 unicode-range 분할과 CSS 생성
-7. ci, release workflow와 Pages specimen
+7. `mise.toml`/`mise.lock` 도구 고정(13.5), ci·release workflow와 Pages 소개 페이지(13.6)
 8. 10장 NFD 한글 실환경 확인과 `ccmp` 필요 여부 결정
 9. 12.6 Regular 한글 굵기 보정(H3) 비교와 채택 여부 결정
 10. 6장 전각/반각 및 중복 기호 allowlist 확정
 
 v1은 일정보다 완성도를 우선한다. 8–10번도 v1 범위에 포함하며, 글리프 품질 항목(8–10, 3)을 먼저 확정한 뒤 릴리스 인프라(1, 2, 4–7)를 마무리한다.
+
+### 13.5 도구와 의존성 고정
+
+종류별로 고정 위치를 하나만 둔다.
+
+| 대상 | 고정 위치 |
+| --- | --- |
+| uv, Node.js(npm publish) 등 실행 도구 | `mise.toml`과 플랫폼별 checksum을 담은 `mise.lock` |
+| Python 패키지(fontTools, Jinja2 등) | `pyproject.toml`과 `uv.lock` |
+| 원본 폰트와 `emoji-data.txt` | `sources.toml`의 URL과 SHA-256 |
+| FontForge와 Nerd Fonts patcher | `nerdfonts/patcher` 컨테이너 이미지 digest |
+
+- Python 패키지는 mise에 중복 선언하지 않는다. mise는 uv 자체만 고정한다.
+- `mise.lock`은 CI와 개발 환경 플랫폼(linux-x64, windows-x64, macos-arm64 등)을 모두 포함해 생성하고 커밋한다.
+- CI는 `jdx/mise-action`으로 도구를 설치한다. lockfile이 있으면 `mise install --locked`로 동작한다. action의 도구 캐시는 lockfile checksum으로 재검증되지 않으므로 도구 캐시를 끄고 mise 다운로드 저장소를 캐시한다.
+- Docker는 mise가 관리하지 않는다. patcher는 PATH에 FontForge가 있으면 직접 실행하고, 없으면 고정 digest 컨테이너로 실행한다.
+- 빌드 로직은 `gyeol-mono` CLI에 둔다. mise task는 Windows 기본 셸이 `cmd /c`이므로 `uv run gyeol-mono <command>` 한 줄 호출만 담고, 셸 문법이나 경로 처리를 넣지 않는다. Makefile은 Windows 기본 환경에서 쓸 수 없고 MSYS 경로 변환 문제가 있어 사용하지 않는다.
+- 사이트 생성용 패키지는 `[dependency-groups]`의 `site` 그룹으로 분리해 폰트 빌드 의존성과 섞지 않는다.
+
+### 13.6 소개 페이지 생성
+
+GitHub Pages 소개 페이지는 한 페이지이며 릴리스마다 주로 버전과 다운로드 정보만 바뀐다. 정적 사이트 생성기(Hugo 등)는 쓰지 않고 Jinja2 템플릿으로 생성한다. 페이지가 여러 개로 늘어나거나 다국어가 필요해지면 그때 다시 검토한다.
+
+- `gyeol-mono site` 명령이 `site/index.html.j2`를 렌더링해 `build/site/`에 출력한다. 생성 HTML은 커밋하지 않는다.
+- Jinja2 environment는 autoescape를 켠다.
+- 템플릿 입력은 모두 같은 태그 빌드의 산출물에서 가져와 값을 중복 기록하지 않는다.
+  - 버전: 태그 하나에서 폰트 `name` ID 5, npm `package.json`, 페이지에 공통으로 반영한다.
+  - 다운로드 링크와 체크섬: Release asset 이름과 `SHA256SUMS`에서 만든다.
+  - specimen 문장: `site/samples.json` 같은 데이터 파일로 분리한다.
+- 페이지는 같은 Pages 산출물에 포함한 분할 WOFF2와 CSS를 상대 경로로 로드한다. jsDelivr 주소는 npm 사용 안내에만 쓴다. npm 배포 전파가 늦어도 페이지가 깨지지 않게 하기 위해서다.
+- 페이지 내용은 한영일 혼용 specimen, 코드, Powerline 프롬프트 예시, 설치 안내(TTF, npm), Releases 다운로드 링크, 라이선스 안내다.
+- release workflow가 `actions/upload-pages-artifact`와 `actions/deploy-pages`로 `build/site/`만 배포한다.
+- `comparisons/hangul`의 내부 비교 페이지는 기존 문자열 치환 방식을 유지하며 공개 사이트에 포함하지 않는다.
 
 ## 14. 라이선스와 저작권 고지
 
@@ -649,3 +686,5 @@ licenses/
 - 초기 출력은 TTF와 WOFF2로 제한한다.
 - NFD 한글은 OS 글꼴 fallback을 기본으로 하고, 실환경에서 자모 분리나 셀 깨짐이 확인될 때만 `ccmp`를 추가한다.
 - 1차 배포 채널은 GitHub Releases, npm(분할 WOFF2와 CSS), GitHub Pages이며 태그 workflow 하나에서 함께 배포한다. Homebrew tap과 Scoop bucket은 v1 이후 검토한다.
+- 실행 도구는 mise, Python 패키지는 uv, 원본은 `sources.toml`, patcher는 컨테이너 digest로 고정한다. 빌드 로직은 CLI에 두고 Makefile은 쓰지 않는다.
+- 소개 페이지는 Hugo 없이 Jinja2 템플릿 한 장으로 생성한다.

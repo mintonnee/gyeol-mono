@@ -17,21 +17,14 @@ class FontNames:
     file_name: str
 
 
-def family_name(*, powerline: bool, preview_source: JapaneseSource | None = None) -> str:
+def family_name(*, preview_source: JapaneseSource | None = None) -> str:
     if preview_source is None:
-        family = BASE_FAMILY
-    else:
-        family = f"{BASE_FAMILY} Preview {candidate(preview_source).preview_label}"
-    return f"{family} PL" if powerline else family
+        return BASE_FAMILY
+    return f"{BASE_FAMILY} Preview {candidate(preview_source).preview_label}"
 
 
-def names_for(
-    style: Style,
-    *,
-    powerline: bool,
-    preview_source: JapaneseSource | None = None,
-) -> FontNames:
-    family = family_name(powerline=powerline, preview_source=preview_source)
+def names_for(style: Style, *, preview_source: JapaneseSource | None = None) -> FontNames:
+    family = family_name(preview_source=preview_source)
     compact_family = family.replace(" ", "")
     compact_style = style.compact_name
     return FontNames(

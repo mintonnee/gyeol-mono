@@ -24,6 +24,7 @@ def test_project_manifest_pins_all_canonical_sources() -> None:
         "ridi-batang",
         "klee-one",
         "ibm-plex-sans-jp",
+        "unicode-emoji-data",
     }
     klee = manifest.select(("klee-one",))[0]
     assert klee.revision == "8b0532731b63ad8a445ca341d8d7d941079b83ab"
@@ -33,6 +34,10 @@ def test_project_manifest_pins_all_canonical_sources() -> None:
     assert ridi.archive_format == "file"
     assert ridi.files == ("RIDIBatang.otf",)
     assert manifest.select(("maru-buri",))[0].role == "hangul"
+    emoji = manifest.select(("unicode-emoji-data",))[0]
+    assert emoji.archive_format == "file"
+    assert emoji.files == ("emoji-data.txt",)
+    assert emoji.version in emoji.url
 
 
 def test_fetch_verifies_and_extracts_only_declared_files(tmp_path: Path) -> None:

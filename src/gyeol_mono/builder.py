@@ -15,6 +15,7 @@ class BuildStage(StrEnum):
     VERIFY_LATIN_METRICS = "verify-latin-metrics"
     MERGE_CJK = "merge-cjk"
     ADD_HANGUL_CCMP = "add-hangul-ccmp"
+    REMOVE_EMOJI_PRESENTATION = "remove-emoji-presentation"
     NORMALIZE_METADATA = "normalize-metadata"
     VALIDATE_TTF = "validate-ttf"
     EXPORT_WOFF2 = "export-woff2"
@@ -24,34 +25,16 @@ class BuildStage(StrEnum):
 class BuildTarget:
     japanese_source: JapaneseSource
     face: FaceSpec
-    powerline: bool
     preview: bool
 
     @property
     def names(self) -> FontNames:
         preview_source = self.japanese_source if self.preview else None
-        return names_for(
-            self.face.style,
-            powerline=self.powerline,
-            preview_source=preview_source,
-        )
+        return names_for(self.face.style, preview_source=preview_source)
 
     @property
     def stages(self) -> tuple[BuildStage, ...]:
-        stages = [BuildStage.FETCH_AND_VERIFY, BuildStage.PREPARE_LATIN]
-        if self.powerline:
-            stages.append(BuildStage.PATCH_POWERLINE)
-        stages.extend(
-            (
-                BuildStage.VERIFY_LATIN_METRICS,
-                BuildStage.MERGE_CJK,
-                BuildStage.ADD_HANGUL_CCMP,
-                BuildStage.NORMALIZE_METADATA,
-                BuildStage.VALIDATE_TTF,
-                BuildStage.EXPORT_WOFF2,
-            )
-        )
-        return tuple(stages)
+        return tuple(BuildStage)
 
     def as_dict(self) -> dict[str, object]:
         return {
@@ -65,7 +48,6 @@ class BuildTarget:
             "hangul_source_weight": self.face.source_weight,
             "hangul_source_style": self.face.hangul_source_style,
             "japanese_source_style": self.face.cjk_source_style,
-            "powerline": self.powerline,
             "family": self.names.family,
             "file_name": self.names.file_name,
             "stages": [stage.value for stage in self.stages],
@@ -78,26 +60,20 @@ class BuildPlan:
 
     @classmethod
     def preview(cls) -> "BuildPlan":
-        return cls.from_sources(tuple(CANDIDATES), powerline_options=(False, True), preview=True)
+        return cls.from_sources(tuple(CANDIDATES), preview=True)
 
     @classmethod
     def release(cls, source: JapaneseSource) -> "BuildPlan":
-        return cls.from_sources((source,), powerline_options=(False, True), preview=False)
+        return cls.from_sources((source,), preview=False)
 
     @classmethod
     def from_sources(
         cls,
         sources: tuple[JapaneseSource, ...],
         *,
-        powerline_options: tuple[bool, ...],
         preview: bool,
     ) -> "BuildPlan":
-        targets = tuple(
-            BuildTarget(source, face, powerline, preview)
-            for source in sources
-            for powerline in powerline_options
-            for face in FACES
-        )
+        targets = tuple(BuildTarget(source, face, preview) for source in sources for face in FACES)
         return cls(targets)
 
     def as_dict(self) -> dict[str, object]:

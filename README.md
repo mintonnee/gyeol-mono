@@ -7,7 +7,7 @@ IBM Plex Mono의 영문, **마루 부리의 한글**, IBM Plex Sans JP의 일본
 
 ```sh
 uv sync
-uv run gyeol-mono fetch --source ibm-plex-mono --source maru-buri --source ibm-plex-sans-jp
+uv run gyeol-mono fetch --source ibm-plex-mono --source maru-buri --source ibm-plex-sans-jp \n  --source unicode-emoji-data
 uv run gyeol-mono build
 ```
 
@@ -23,8 +23,13 @@ y=300 기준 확대 후 +30 unit 올림), 일본어 기본 배율은 1.00이며 
 | Bold Italic | SemiBold Italic | 마루 부리 SemiBold upright | SemiBold upright |
 
 Bold는 세 스크립트 모두 SemiBold 원본을 사용합니다.
-한글 synthetic bold/italic은 적용하지 않습니다. 현재 구현은 non-Powerline preview
-빌드이며 Powerline 패키징과 NFD 한글 shaping은 아직 구현하지 않았습니다.
+한글 synthetic bold/italic은 적용하지 않습니다.
+기본 표시가 emoji인 코드포인트(Unicode 18.0 `Emoji_Presentation=Yes`)는 원본과 무관하게
+글꼴에서 제외해 OS emoji 글꼴로 fallback되게 합니다. ♥, ★처럼 텍스트 표시가 기본인 기호는 유지합니다.
+IBM Plex Mono가 ✓와 짝으로 그린 ❌(`U+274C`) 흑백 윤곽은 ✗(`U+2717`)로 옮겨 보존합니다.
+배포 패밀리는 Powerline을 기본 포함하는 `Gyeol Mono` 하나이며 별도 PL 패밀리는 두지 않습니다.
+현재 구현은 Powerline patch 전 preview 빌드이며 Powerline patch와 NFD 한글 shaping은 아직
+구현하지 않았습니다.
 
 ```sh
 uv run gyeol-mono plan --json
@@ -32,7 +37,7 @@ uv run pytest
 uv run ruff check src tests scripts
 ```
 
-`plan`은 목표 빌드 행렬을 나타내므로 미구현 PL 단계도 포함합니다.
+`plan`은 목표 빌드 행렬을 나타내므로 미구현 Powerline patch 단계도 포함합니다.
 JSON의 `hangul_source_style`과 `japanese_source_style`로 스크립트별 원본 스타일을
 확인할 수 있습니다.
 

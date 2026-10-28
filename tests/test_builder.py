@@ -2,26 +2,33 @@ from gyeol_mono.builder import BuildPlan, BuildStage
 from gyeol_mono.japanese import JapaneseSource
 
 
-def test_preview_plan_contains_sixteen_unique_targets() -> None:
+def test_preview_plan_contains_eight_unique_targets() -> None:
     plan = BuildPlan.preview()
 
-    assert len(plan.targets) == 16
-    assert len({target.names.file_name for target in plan.targets}) == 16
-
-
-def test_release_plan_contains_eight_targets_without_preview_names() -> None:
-    plan = BuildPlan.release(JapaneseSource.KLEE_ONE)
-
     assert len(plan.targets) == 8
-    assert all("Preview" not in target.names.family for target in plan.targets)
+    assert len({target.names.file_name for target in plan.targets}) == 8
 
 
-def test_powerline_is_patched_before_cjk_merge() -> None:
-    target = next(target for target in BuildPlan.preview().targets if target.powerline)
+def test_release_plan_contains_four_targets_without_preview_or_pl_names() -> None:
+    plan = BuildPlan.release(JapaneseSource.IBM_PLEX_SANS_JP)
 
-    assert target.stages.index(BuildStage.PATCH_POWERLINE) < target.stages.index(
-        BuildStage.MERGE_CJK
-    )
+    assert len(plan.targets) == 4
+    assert {target.names.family for target in plan.targets} == {"Gyeol Mono"}
+
+
+def test_every_target_patches_powerline_before_cjk_merge() -> None:
+    for target in BuildPlan.preview().targets:
+        assert target.stages.index(BuildStage.PATCH_POWERLINE) < target.stages.index(
+            BuildStage.MERGE_CJK
+        )
+
+
+def test_emoji_presentation_is_removed_after_merges_before_metadata() -> None:
+    stages = BuildPlan.release(JapaneseSource.IBM_PLEX_SANS_JP).targets[0].stages
+
+    removal = stages.index(BuildStage.REMOVE_EMOJI_PRESENTATION)
+    assert stages.index(BuildStage.MERGE_CJK) < removal
+    assert removal < stages.index(BuildStage.NORMALIZE_METADATA)
 
 
 def test_hangul_uses_maru_buri_at_the_same_weight_as_japanese() -> None:

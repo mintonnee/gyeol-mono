@@ -11,6 +11,12 @@ from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables._c_m_a_p import CmapSubtable
 
 from gyeol_mono.builder import BuildTarget
+from gyeol_mono.emoji import (
+    EMOJI_DATA_FILE,
+    EMOJI_DATA_SOURCE,
+    TEXT_PRESENTATION_ALIASES,
+    load_emoji_presentation,
+)
 from gyeol_mono.japanese import JapaneseSource
 from gyeol_mono.metrics import (
     CJK_ADVANCE,
@@ -45,6 +51,7 @@ JAPANESE_RANGES = (
     (0x2F800, 0x2FA1F),
     (0x30000, 0x323AF),
 )
+LAYOUT_TABLES = ("GDEF", "GPOS", "GSUB")
 
 
 class FontBuildError(RuntimeError):
@@ -94,8 +101,8 @@ def build_preview_font(
     hangul_scale: float = HANGUL_SCALE,
     japanese_scale: float = JAPANESE_SCALE,
 ) -> BuiltFont:
-    if target.powerline or not target.preview:
-        raise FontBuildError("prototype builder only supports non-Powerline preview targets")
+    if not target.preview:
+        raise FontBuildError("prototype builder only supports preview targets")
     if hangul_scale <= 0 or japanese_scale <= 0:
         raise FontBuildError("CJK scale must be positive")
 
@@ -118,6 +125,9 @@ def build_preview_font(
         _verify_truetype(font, "IBM Plex Mono")
         _verify_outline_source(hangul, "Maru Buri")
         _verify_truetype(japanese, target.japanese_source.value)
+        emoji_presentation = load_emoji_presentation(
+            layout.font(EMOJI_DATA_SOURCE, EMOJI_DATA_FILE)
+        )
         _verify_latin_metrics(font)
 
         hangul_count = _merge_codepoints(
@@ -136,6 +146,8 @@ def build_preview_font(
             glyph_prefix="ja",
             scale=japanese_scale,
         )
+        _alias_codepoints(font, TEXT_PRESENTATION_ALIASES)
+        _remove_codepoints(font, emoji_presentation)
         _verify_glyph_inventory(font)
         _normalize_metadata(font, target)
         font.save(ttf_path, reorderTables=False)
@@ -144,16 +156,30 @@ def build_preview_font(
         hangul.close()
         font.close()
 
-    validate_built_font(ttf_path, target)
+    validate_built_font(ttf_path, target, emoji_presentation=emoji_presentation)
     _save_woff2(ttf_path, woff2_path)
-    validate_built_font(woff2_path, target)
+    validate_built_font(woff2_path, target, emoji_presentation=emoji_presentation)
     return BuiltFont(target, ttf_path, woff2_path, hangul_count, japanese_count)
 
 
-def validate_built_font(path: Path, target: BuildTarget, *, check_hangul_cell: bool = True) -> None:
+def validate_built_font(
+    path: Path,
+    target: BuildTarget,
+    *,
+    check_hangul_cell: bool = True,
+    emoji_presentation: frozenset[int] = frozenset(),
+) -> None:
     font = TTFont(path, recalcTimestamp=False)
     try:
         cmap = font.getBestCmap()
+        for table in font["cmap"].tables:
+            if table.isUnicode():
+                leaked = sorted(emoji_presentation & table.cmap.keys())
+                if leaked:
+                    raise FontBuildError(
+                        f"{path}: emoji presentation U+{leaked[0]:04X} is mapped "
+                        f"({len(leaked)} total)"
+                    )
         for codepoint in (0x41, 0xAC00, 0x3042, 0x65E5):
             if codepoint not in cmap:
                 raise FontBuildError(f"{path} is missing U+{codepoint:04X}")
@@ -265,6 +291,74 @@ def _merge_codepoints(
     destination.setGlyphOrder(list(destination_glyf.glyphOrder))
     _update_cmap(destination, cmap_additions)
     return len(source_to_destination)
+
+
+def _alias_codepoints(font: TTFont, aliases: dict[int, int]) -> dict[int, str]:
+    """Map each unused target codepoint to its source codepoint's glyph."""
+    cmap = font.getBestCmap()
+    additions = {
+        target: cmap[source]
+        for source, target in aliases.items()
+        if source in cmap and target not in cmap
+    }
+    _update_cmap(font, additions)
+    return additions
+
+
+def _remove_codepoints(font: TTFont, codepoints: frozenset[int]) -> tuple[int, ...]:
+    """Unmap ``codepoints`` and drop glyphs that nothing else can still reach."""
+    removed: set[int] = set()
+    unmapped_glyphs: set[str] = set()
+    unicode_tables = [table for table in font["cmap"].tables if table.isUnicode()]
+    for table in unicode_tables:
+        for codepoint in codepoints & table.cmap.keys():
+            unmapped_glyphs.add(table.cmap.pop(codepoint))
+            removed.add(codepoint)
+
+    still_mapped = {name for table in font["cmap"].tables for name in table.cmap.values()}
+    orphans = unmapped_glyphs - still_mapped - _referenced_glyphs(font)
+    glyf = font["glyf"]
+    for glyph_name in sorted(orphans):
+        del glyf[glyph_name]
+        del font["hmtx"].metrics[glyph_name]
+    font.setGlyphOrder(list(glyf.glyphOrder))
+    return tuple(sorted(removed))
+
+
+def _referenced_glyphs(font: TTFont) -> set[str]:
+    """Return glyphs used as composite components or named by OpenType layout tables."""
+    glyf = font["glyf"]
+    referenced = {
+        component.glyphName
+        for glyph_name in font.getGlyphOrder()
+        if glyf[glyph_name].isComposite()
+        for component in glyf[glyph_name].components
+    }
+    glyph_names = set(font.getGlyphOrder())
+    pending: list[object] = []
+    for tag in LAYOUT_TABLES:
+        if tag in font:
+            font[tag].table.ensureDecompiled(recurse=True)
+            pending.append(font[tag].table)
+    seen: set[int] = set()
+    # Layout subtables store glyph names in lists, dicts and attributes of varying shape.
+    while pending:
+        value = pending.pop()
+        if isinstance(value, str):
+            if value in glyph_names:
+                referenced.add(value)
+            continue
+        if id(value) in seen:
+            continue
+        seen.add(id(value))
+        if isinstance(value, dict):
+            pending.extend(value.keys())
+            pending.extend(value.values())
+        elif isinstance(value, (list, tuple, set, frozenset)):
+            pending.extend(value)
+        elif hasattr(value, "__dict__"):
+            pending.extend(vars(value).values())
+    return referenced
 
 
 def _draw_decomposed(glyf_table, glyph_name: str, pen, *, stack: tuple[str, ...]) -> None:

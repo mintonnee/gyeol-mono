@@ -70,3 +70,15 @@ files = [
     "ibm-plex-sans-jp/fonts/complete/ttf/unhinted/IBMPlexSansJP-Regular.ttf",
     "ibm-plex-sans-jp/fonts/complete/ttf/unhinted/IBMPlexSansJP-SemiBold.ttf",
 ]
+
+[[source]]
+id = "unicode-emoji-data"
+role = "emoji-presentation"
+version = "18.0.0"
+release_page = "https://www.unicode.org/versions/Unicode18.0.0/"
+url = "https://www.unicode.org/Public/18.0.0/ucd/emoji/emoji-data.txt"
+archive = "emoji-data-18.0.0.txt"
+archive_format = "file"
+sha256 = "80d00f8e616a0ef27fd6b8de3b758c06383b5d917e2977709578e68baf733bf1"
+license_url = "https://www.unicode.org/license.txt"
+files = ["emoji-data.txt"]

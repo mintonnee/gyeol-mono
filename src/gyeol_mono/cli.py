@@ -22,7 +22,7 @@ def parser() -> argparse.ArgumentParser:
     plan.add_argument(
         "--release-source",
         choices=[source.value for source in JapaneseSource],
-        help="emit an 8-target release plan instead of the 16-target preview plan",
+        help="emit a 4-target release plan instead of the 8-target preview plan",
     )
     plan.add_argument("--json", action="store_true", help="emit machine-readable JSON")
 
@@ -95,7 +95,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         faces = tuple(face for face in FACES if face.style in styles)
         for source in sources:
             for face in faces:
-                target = BuildTarget(source, face, powerline=False, preview=True)
+                target = BuildTarget(source, face, preview=True)
                 artifact = build_preview_font(
                     target,
                     layout=layout,
@@ -128,9 +128,8 @@ def main(argv: Sequence[str] | None = None) -> int:
 def _print_table(plan: BuildPlan) -> None:
     print(f"targets: {len(plan.targets)}")
     for target in plan.targets:
-        powerline = "PL" if target.powerline else "base"
         print(
-            f"{target.japanese_source.value:18} {powerline:4} "
+            f"{target.japanese_source.value:18} "
             f"{target.face.style.value:11} -> {target.names.file_name} "
             f"(hangul: Maru Buri {target.face.hangul_source_style})"
         )

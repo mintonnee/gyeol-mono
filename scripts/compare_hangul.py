@@ -74,7 +74,7 @@ def main():
     latin_path = layout.font("ibm-plex-mono", "IBMPlexMono-Regular.ttf")
     jp_path = layout.font("ibm-plex-sans-jp", "IBMPlexSansJP-Regular.ttf")
     maru_path = layout.font("maru-buri", "MaruBuri-Regular.ttf")
-    target = BuildTarget(JapaneseSource.IBM_PLEX_SANS_JP, FACES[0], False, True)
+    target = BuildTarget(JapaneseSource.IBM_PLEX_SANS_JP, FACES[0], True)
     summary = {
         "conditions": {
             "style": "Regular",

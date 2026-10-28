@@ -170,27 +170,38 @@ def test_preview_build_uses_maru_buri_at_the_face_weight(tmp_path, face_index):
 
     face = FACES[face_index]
     latin = tmp_path / "latin.ttf"
-    _font({cp: f"g{cp}" for cp in range(32, 127)}, advance=600).save(latin)
+    _font({**{cp: f"g{cp}" for cp in range(32, 127)}, 0x274C: "cross"}, advance=600).save(latin)
     maru = tmp_path / "maru.ttf"
     _font({0xAC00: "ga"}, advance=1000).save(maru)
     jp = tmp_path / "jp.ttf"
     _font({0x3042: "a", 0x65E5: "day"}, advance=1000).save(jp)
+    emoji = _emoji_data(tmp_path)
     calls = []
 
     class Layout:
         def font(self, source_id, file_name):
             calls.append((source_id, file_name))
-            return {"ibm-plex-mono": latin, "maru-buri": maru, "ibm-plex-sans-jp": jp}[source_id]
+            return {
+                "ibm-plex-mono": latin,
+                "maru-buri": maru,
+                "ibm-plex-sans-jp": jp,
+                "unicode-emoji-data": emoji,
+            }[source_id]
 
-    target = BuildTarget(JapaneseSource.IBM_PLEX_SANS_JP, face, False, True)
+    target = BuildTarget(JapaneseSource.IBM_PLEX_SANS_JP, face, True)
     artifact = build_preview_font(target, layout=Layout(), output_root=tmp_path / "out")
     weight = "SemiBold" if face.output_weight == 700 else "Regular"
     assert ("maru-buri", f"MaruBuri-{weight}.ttf") in calls
     assert not any(source == "ridi-batang" for source, _ in calls)
     assert artifact.hangul_glyphs == 1
     for path in (artifact.ttf_path, artifact.woff2_path):
-        validate_built_font(path, target)
+        validate_built_font(path, target, emoji_presentation=frozenset({0x274C}))
         with TTFont(path) as font:
+            assert 0x274C not in font.getBestCmap()
+            # post format 3 drops names, so identify the kept cross by outline and advance.
+            ballot = font.getBestCmap()[0x2717]
+            assert font["hmtx"][ballot][0] == 600
+            assert (font["glyf"][ballot].xMin, font["glyf"][ballot].yMax) == (100, 700)
             glyph = font["glyf"][font.getBestCmap()[0xAC00]]
             # Hangul 1.10 around y=300, then +30: x 100..500 -> 160..600, y 0..700 -> 0..770.
             assert (glyph.xMin, glyph.xMax, glyph.yMin, glyph.yMax) == (160, 600, 0, 770)
@@ -210,11 +221,32 @@ def test_validate_rejects_hangul_outside_cell(tmp_path):
     for source_id, font in paths.items():
         paths[source_id] = tmp_path / f"{source_id}.ttf"
         font.save(paths[source_id])
+    paths["unicode-emoji-data"] = _emoji_data(tmp_path)
 
     class Layout:
         def font(self, source_id, file_name):
             return paths[source_id]
 
-    target = BuildTarget(JapaneseSource.IBM_PLEX_SANS_JP, FACES[0], False, True)
+    target = BuildTarget(JapaneseSource.IBM_PLEX_SANS_JP, FACES[0], True)
     with pytest.raises(FontBuildError, match="exceeds the cell"):
         build_preview_font(target, layout=Layout(), output_root=tmp_path / "out", hangul_scale=2.0)
+
+
+def test_validate_rejects_mapped_emoji_presentation(tmp_path):
+    from gyeol_mono.builder import BuildTarget
+    from gyeol_mono.font_builder import validate_built_font
+    from gyeol_mono.japanese import JapaneseSource
+    from gyeol_mono.models import FACES
+
+    path = tmp_path / "leaky.ttf"
+    _font({0x41: "A", 0x274C: "cross"}, advance=600).save(path)
+    target = BuildTarget(JapaneseSource.IBM_PLEX_SANS_JP, FACES[0], True)
+
+    with pytest.raises(FontBuildError, match=r"emoji presentation U\+274C"):
+        validate_built_font(path, target, emoji_presentation=frozenset({0x274C}))
+
+
+def _emoji_data(directory: Path) -> Path:
+    path = directory / "emoji-data.txt"
+    path.write_text("274C ; Emoji_Presentation # (❌) cross mark\n", encoding="utf-8")
+    return path

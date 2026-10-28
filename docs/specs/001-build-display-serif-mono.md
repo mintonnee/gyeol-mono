@@ -2,7 +2,7 @@
 
 - 상태: Draft
 - 작성일: 2026-07-11
-- 최종 수정일: 2026-10-01
+- 최종 수정일: 2026-10-28
 - 대상 구현: 정적 TTF 및 WOFF2 패밀리
 
 ## 1. 개요
@@ -11,7 +11,7 @@
 
 결과 글꼴은 라틴 문자에 600 units, 한글·가나·한자에 1,200 units의 advance를 사용하는 2폭 구조다. 따라서 엄밀히는 모든 글리프가 동일한 폭을 갖는 monospace가 아니라, 라틴 1셀과 CJK 2셀로 구성된 duospace 글꼴이다. 사용자에게는 일반적인 CJK 코딩 글꼴과 동일하게 모노스페이스 패밀리로 제공한다.
 
-기본 패밀리와 Powerline 글리프를 포함한 터미널용 `PL` 패밀리를 별도로 생성한다. 전체 Nerd Fonts 아이콘 세트는 포함하지 않는다.
+배포 패밀리는 `Gyeol Mono` 하나이며 Powerline 및 Powerline Extra 글리프를 기본으로 포함한다. 별도 `PL` 패밀리는 만들지 않는다(12.10). 전체 Nerd Fonts 아이콘 세트는 포함하지 않는다. 기본 표시가 emoji인 코드포인트는 어느 원본에서 왔든 최종 글꼴에서 제외하고 OS emoji 글꼴 fallback에 맡긴다(6.1).
 
 ## 2. 목표
 
@@ -21,7 +21,8 @@
 - Klee One과 IBM Plex Sans JP를 동일 조건에서 비교한 결과에 따라 IBM Plex Sans JP를 최종 일본어 원본으로 사용한다.
 - 본문 크기와 디스플레이 크기에서 모두 읽기 좋은 한영일 혼용 결과를 만든다.
 - 편집기와 터미널에서 ASCII 1셀, CJK 2셀 정렬을 보장한다.
-- Powerline 및 Powerline Extra 구분자를 라틴 1셀 크기로 제공한다.
+- 기본 패밀리에서 Powerline 및 Powerline Extra 구분자를 라틴 1셀 크기로 제공한다.
+- 컬러 emoji가 OS emoji 글꼴로 fallback되도록 emoji presentation 코드포인트를 글꼴에서 비워 둔다.
 - 원본 다운로드부터 산출물 생성까지 재현 가능한 빌드 파이프라인을 제공한다.
 - 구조 검사, shaping 검사, 렌더링 검수를 자동화할 수 있는 기반을 마련한다.
 
@@ -30,6 +31,7 @@
 초기 버전에서는 다음 항목을 지원하지 않는다.
 
 - 전체 Nerd Fonts 아이콘 세트
+- 컬러 또는 흑백 emoji 글리프 및 emoji ZWJ·피부색·국기 시퀀스 shaping
 - Variable Font
 - 한글 및 일본어 글리프의 synthetic italic 또는 oblique
 - ExtraLight, Light, Medium, SemiBold, ExtraBold 등 별도 사용자 노출 웨이트
@@ -52,6 +54,7 @@
 | 비교 실험 A | [Klee One Version1.000](https://github.com/fontworks-fonts/Klee/releases/tag/Version1.000) | commit `8b0532731b63ad8a445ca341d8d7d941079b83ab` ZIP | `4ca4e5d364fa28a8035e0041d94feb745b4104cfda828d42b5d0d8f13bae83c7` |
 | 일본어 원본 확정안 B | [IBM Plex Sans JP 3.0.0](https://github.com/IBM/plex/releases/tag/%40ibm%2Fplex-sans-jp%403.0.0) | `ibm-plex-sans-jp.zip` | `4c14c41552934b0bc92fc216a76b36bdc78f745dfbeed1115f9b8bc405ee314f` |
 | Powerline 글리프 | Nerd Fonts Font Patcher에 포함된 Powerline/Powerline Extra | Font Patcher 입력 자산 | Nerd Fonts 버전 결정 후 추가 |
+| Emoji presentation 판정 | [Unicode 18.0.0](https://www.unicode.org/versions/Unicode18.0.0/) `emoji-data.txt` | `emoji-data-18.0.0.txt` | `80d00f8e616a0ef27fd6b8de3b758c06383b5d917e2977709578e68baf733bf1` |
 
 IBM Plex Mono에서는 complete TTF의 Regular, Italic, SemiBold, SemiBold Italic을 사용한다. IBM Plex Sans JP에서는 outline 변환 후 무효가 되는 힌팅을 가져오지 않도록 unhinted complete TTF의 Regular와 SemiBold를 사용한다. 마루 부리와 Klee One에서도 Regular와 SemiBold TTF만 추출한다.
 
@@ -70,25 +73,25 @@ Klee의 `Version1.000`은 별도 GitHub Release asset이 아니라 태그이므�
 - [IBM Plex Sans JP 메타데이터](https://github.com/google/fonts/blob/main/ofl/ibmplexsansjp/METADATA.pb)
 - [Nerd Fonts Font Patcher](https://github.com/ryanoasis/nerd-fonts#font-patcher)
 - [Nerd Fonts Glyph Sets and Code Points](https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points)
+- [Unicode Technical Standard #51: Unicode Emoji](https://www.unicode.org/reports/tr51/)
 
 ## 5. 패밀리와 스타일
 
 최종 family name은 `Gyeol Mono`로 확정한다. 이름의 `Gyeol`은 글자의 결, 획의 질감과 서로 다른 스크립트가 한 문장 안에서 만드는 흐름을 의미한다. IBM Plex의 Reserved Font Name인 `Plex`를 최종 사용자 노출 이름에 사용하지 않는다.
 
-두 개의 배포 패밀리를 생성한다.
+배포 패밀리는 하나다.
 
 | 패밀리 | 용도 | Powerline 포함 여부 |
 | --- | --- | --- |
-| `Gyeol Mono` | 일반 디스플레이, 웹, 편집기 | 미포함 |
-| `Gyeol Mono PL` | 터미널 및 Powerline 프롬프트 | 포함 |
+| `Gyeol Mono` | 터미널, 편집기, 일반 디스플레이, 웹 | 포함 |
 
-`PL` 패밀리는 Powerline subset만 포함하므로 이름에 `Nerd Font`를 사용하지 않는다.
+Powerline subset만 포함하므로 이름에 `Nerd Font`, `NF` 또는 `PL` 접미사를 사용하지 않는다. 이전 초안의 `Gyeol Mono PL` 패밀리는 폐지했다(12.10).
 
 ### 5.1 OpenType 및 파일 이름
 
 OpenType family name은 플랫폼 호환성을 위해 ASCII `Gyeol Mono`를 사용한다. `결 모노`는 README, 웹사이트와 specimen에서 사용하는 한국어 표시 이름이며 OpenType의 기본 family name으로 사용하지 않는다.
 
-기본 패밀리 이름은 다음과 같다.
+패밀리 이름은 다음과 같다.
 
 | 스타일 | Full name | PostScript name | 파일 이름 |
 | --- | --- | --- | --- |
@@ -97,16 +100,7 @@ OpenType family name은 플랫폼 호환성을 위해 ASCII `Gyeol Mono`를 사�
 | Bold | `Gyeol Mono Bold` | `GyeolMono-Bold` | `GyeolMono-Bold.ttf` |
 | Bold Italic | `Gyeol Mono Bold Italic` | `GyeolMono-BoldItalic` | `GyeolMono-BoldItalic.ttf` |
 
-Powerline 패밀리 이름은 다음과 같다.
-
-| 스타일 | Full name | PostScript name | 파일 이름 |
-| --- | --- | --- | --- |
-| Regular | `Gyeol Mono PL Regular` | `GyeolMonoPL-Regular` | `GyeolMonoPL-Regular.ttf` |
-| Italic | `Gyeol Mono PL Italic` | `GyeolMonoPL-Italic` | `GyeolMonoPL-Italic.ttf` |
-| Bold | `Gyeol Mono PL Bold` | `GyeolMonoPL-Bold` | `GyeolMonoPL-Bold.ttf` |
-| Bold Italic | `Gyeol Mono PL Bold Italic` | `GyeolMonoPL-BoldItalic` | `GyeolMonoPL-BoldItalic.ttf` |
-
-`name` ID 1과 16은 각각 `Gyeol Mono` 또는 `Gyeol Mono PL`로 통일한다. ID 2와 17은 `Regular`, `Italic`, `Bold`, `Bold Italic` 중 해당 값을 사용한다. ID 4와 6은 위 표의 Full/PostScript name을 사용한다.
+`name` ID 1과 16은 `Gyeol Mono`로 통일한다. ID 2와 17은 `Regular`, `Italic`, `Bold`, `Bold Italic` 중 해당 값을 사용한다. ID 4와 6은 위 표의 Full/PostScript name을 사용한다.
 
 후보 비교 빌드는 동시에 설치해 비교할 수 있도록 사용자 노출 family를 `Gyeol Mono Preview A`와 `Gyeol Mono Preview B`로 분리했다. manifest에서 Preview A는 Klee One, Preview B는 IBM Plex Sans JP에 대응한다. 비교 결과 B안을 확정했으며 최종 릴리스에는 Preview 이름이나 Klee One 글리프를 포함하지 않는다.
 
@@ -123,7 +117,7 @@ Powerline 패밀리 이름은 다음과 같다.
 
 두꺼운 face는 세 스크립트의 획 밀도를 일치시키기 위해 모두 SemiBold 600 원본을 사용한다. Synthetic embolden은 적용하지 않는다. 다만 최종 사용자 노출 이름과 `OS/2.usWeightClass`는 Bold 700으로 설정한다. 이는 일부 터미널이 `SemiBold` face를 ANSI SGR 1 또는 Bold face로 선택하지 않는 문제를 피하기 위한 의도적인 매핑이다.
 
-후보 비교 단계에서는 Klee One과 IBM Plex Sans JP에 대해 각각 기본 패밀리 4개와 `PL` 패밀리 4개, 총 8개 정적 TTF를 생성한다. 두 후보를 합친 비교 산출물은 총 16개다. 최종 배포에는 IBM Plex Sans JP를 사용한 기본 패밀리 4개와 `PL` 패밀리 4개만 포함한다.
+후보 비교 단계에서는 Klee One과 IBM Plex Sans JP에 대해 각각 RIBBI 4개 정적 TTF를 생성했다. 최종 배포에는 IBM Plex Sans JP를 사용한 `Gyeol Mono` RIBBI 4개만 포함한다.
 
 ## 6. 글리프 소유권
 
@@ -147,6 +141,8 @@ Powerline 패밀리 이름은 다음과 같다.
 | CJK 기호 및 문장부호 `U+3000–U+303F` | 기본적으로 선택한 일본어 원본 | 1,200 |
 | 전각 및 반각 문자 `U+FF00–U+FFEF` | 문자별 allowlist | 600 또는 1,200 |
 | Powerline 및 Powerline Extra | Nerd Fonts 자산 | 600 |
+| `U+2717` BALLOT X | IBM Plex Mono `U+274C` 윤곽(6.1) | 600 |
+| `Emoji_Presentation=Yes` 코드포인트 | 없음(OS emoji 글꼴 fallback) | — |
 
 위 한글 범위는 소유권 규칙이며 실제 원본 `cmap`에 있는 글리프만 복사한다. 마루 부리는 완성형 11,172자와 호환용 자모 51자를 지원하지만 결합 자모 `U+1100–U+11FF`와 자모 확장-A/B는 포함하지 않는다. 현재 빌더는 NFD 조합을 지원하지 않는다.
 
@@ -155,6 +151,24 @@ Powerline 패밀리 이름은 다음과 같다.
 마루 부리와 IBM Plex Sans JP에 포함된 라틴 글리프는 복사하지 않는다. 한자는 임의의 전체 Unicode 범위를 가정하지 않고 IBM Plex Sans JP의 `cmap`에 실제로 존재하는 글리프만 복사한다.
 
 초기 버전의 한자 기본 형태는 일본어 원본이 제공하는 JP glyph form이다. 터미널과 IDE가 일반적으로 `ko` 또는 `ja` language tag를 제공하지 않는 점을 고려해 JP/KR `locl` 전환은 구현하지 않는다.
+
+### 6.1 Emoji presentation 코드포인트 제외
+
+터미널과 대부분의 렌더러는 기본 글꼴에 글리프가 있으면 그 글리프를 먼저 사용한다. 기본 표시가 emoji인 문자에 흑백 글리프가 남아 있으면 OS의 컬러 emoji가 가려지므로 다음 규칙을 적용한다.
+
+- 고정한 `emoji-data.txt`에서 `Emoji_Presentation=Yes`인 코드포인트를 최종 `cmap`의 모든 서브테이블에서 제거한다.
+- 원본을 가리지 않는다. IBM Plex Mono 베이스, CJK 병합 원본, Nerd Fonts 자산 모두에 적용한다.
+- 판정 기준은 `Emoji` 속성이 아니라 `Emoji_Presentation` 속성이다. `#`, `*`, `0–9`, `©`, `®`, `♥`, `★`, `☰`처럼 `Emoji=Yes`이지만 기본 표시가 텍스트인 문자는 유지한다. 터미널 UI에서는 이 기호들이 글꼴의 1셀 흑백 글리프로 표시되는 편이 정렬에 유리하다.
+- `U+FE0E`, `U+FE0F` variation selector와 emoji 시퀀스용 `GSUB`는 추가하지 않는다. VS16이 붙은 텍스트 기호의 컬러 전환과 emoji 셀 폭(wcwidth)은 터미널과 OS가 결정한다.
+- 매핑을 제거한 뒤 다른 `cmap` 항목, composite glyph, OpenType layout 테이블(`GDEF`, `GPOS`, `GSUB`) 어디에서도 참조하지 않는 글리프는 glyph order에서 제거한다. layout 테이블이 참조하는 글리프는 보수적으로 남긴다.
+- 제거는 모든 원본 병합과 패치가 끝난 뒤, 메타데이터와 메트릭을 최종 정규화하기 전에 한 번 수행한다. 따라서 이후 단계가 emoji 코드포인트를 다시 추가하지 않는 한 결과가 원본 구성에 의존하지 않는다.
+- 원본이 emoji 코드포인트에 텍스트용 흑백 기호를 디자인해 둔 경우, 제거 직전에 그 글리프를 의미가 같은 text presentation 코드포인트에 추가 매핑해 보존할 수 있다. 대상 코드포인트가 이미 매핑되어 있으면 덮어쓰지 않는다. 현재 alias는 `U+274C` → `U+2717` 하나다.
+
+`Emoji_Presentation=Yes` 문자는 Regional Indicator를 제외하면 모두 East Asian Width가 `W`다. 터미널은 이 문자에 2셀을 배정하므로, 원본의 1셀(600) 흑백 글리프를 남기면 컬러 emoji를 가릴 뿐 아니라 글리프 뒤에 빈 셀이 생긴다.
+
+2026-10-28 preview B Regular 기준 해당 코드포인트는 IBM Plex Mono에서 온 `U+274C`(❌) 하나였다. 이 글리프는 glyph order에서 `uni2713`(✓) 바로 뒤에 있고, ✓와 같은 획 두께의 1셀 X 형태라 PASS/FAIL 같은 텍스트 표기용 ✓/✗ 짝으로 설계된 것으로 보인다. IBM Plex Mono에는 `U+2717`이 없으므로 이 윤곽을 `U+2717`(✗, East Asian Width `N`)에 매핑해 보존하고 `U+274C`는 OS emoji로 넘긴다. JetBrains Mono 2.304도 ✓/✗를 1셀 짝으로 제공한다.
+
+다른 터미널 글꼴도 emoji presentation 코드포인트를 일부 포함한다(2026-10-28 확인). JetBrains Mono 2.304 Regular는 `U+26A1`(⚡), Cascadia Code 2407.24 Regular는 `U+25FD`, `U+25FE`, `U+2B1B`, `U+2B1C`를 1셀 흑백 글리프로 포함하고 Roboto Mono는 포함하지 않는다. Cascadia Code NF는 여기에 Nerd Fonts의 `U+26A1`이 더해진다. IBM Plex Sans JP Regular와 마루 부리 Regular에는 `U+1F000–U+1FAFF` 영역 글리프가 각각 1자, 27자 있지만 6장의 소유권 규칙에 따라 복사되지 않는다. 향후 Nerd Fonts 세트를 추가하면 Octicons의 `U+26A1`(⚡)처럼 PUA 밖 emoji 코드포인트를 쓰는 아이콘이 생기므로 이 규칙이 함께 걸러야 한다.
 
 ## 7. 메트릭
 
@@ -241,7 +255,7 @@ Italic variant는 다음 메타데이터를 정확히 설정해야 한다.
 
 ### 9.1 포함 범위
 
-Nerd Fonts의 다음 Powerline 범위를 포함한다.
+`Gyeol Mono`의 모든 스타일에 Nerd Fonts의 다음 Powerline 범위를 포함한다.
 
 | 세트 | 코드포인트 |
 | --- | --- |
@@ -250,6 +264,10 @@ Nerd Fonts의 다음 Powerline 범위를 포함한다.
 
 Powerline 글리프의 advance는 모두 600이다. 배경색 경계에서 가는 틈이 생기지 않도록 Nerd Fonts patcher가 정의하는 좌우 overlap을 보존한다.
 
+위 범위는 2026-10-28 preview B 빌드의 기존 글리프와 겹치지 않는다. 당시 PUA 글리프는 IBM Plex Mono의 `U+F6D7`, `U+F6D8` 두 개뿐이었고 `U+2630`은 비어 있었다. `U+2630`(☰)은 text presentation 문자이므로 6.1의 emoji 제외 대상이 아니다.
+
+Powerline 글리프는 터미널 셀 높이(`-275:1025`)에 맞춰 그려지므로 CSS `line-height`를 바꾸는 웹·문서 환경에서는 상하 경계가 맞지 않을 수 있다. 이 환경에서는 PUA 문자를 입력할 일이 드물어 기본 포함의 비용으로 수용한다.
+
 ### 9.2 패치 순서
 
 Powerline patch는 한글 병합 전에 IBM Plex Mono 정적 TTF에 적용한다.
@@ -257,7 +275,8 @@ Powerline patch는 한글 병합 전에 IBM Plex Mono 정적 TTF에 적용한다
 ```text
 IBM Plex Mono upright/italic
   -> Powerline subset patch
-  -> 마루 부리 한글 병합
+  -> 마루 부리 한글 및 IBM Plex Sans JP 병합
+  -> Emoji_Presentation 코드포인트 제거(6.1)
   -> OpenType 메타데이터 및 메트릭 최종 정규화
   -> 검증 및 패키징
 ```
@@ -285,7 +304,7 @@ fontforge -script font-patcher IBMPlexMono-Italic.ttf \
 | 옵션 | 사용하지 않는 이유 |
 | --- | --- |
 | `--mono` | 기존 글리프까지 1셀 폭으로 강제할 수 있어 1,200폭 한글을 손상시킴 |
-| `--complete` | 전체 Nerd Fonts 아이콘은 프로젝트 범위 밖임 |
+| `--complete` | 전체 Nerd Fonts 아이콘은 기본 패밀리 범위 밖임(별도 패밀리는 15장 미결정 사항) |
 | `--adjust-line-height` | 최종 수직 메트릭은 자체 빌더가 통제함 |
 | `--variable-width-glyphs` | Powerline 심볼은 정확히 600폭이어야 함 |
 
@@ -316,13 +335,13 @@ CJK 병합 시 다음 테이블을 갱신해야 한다.
 빌드는 다음 단계를 명시적으로 분리한다.
 
 1. manifest에 고정된 원본 다운로드 및 SHA-256 검증
-2. IBM Plex Mono 원본을 기본 패밀리 branch로 유지
-3. IBM Plex Mono variant별 Powerline intermediate를 `PL` branch에 생성
-4. 두 branch 모두에서 라틴 advance 600 검증
-5. 마루 부리와 IBM Plex Sans JP 글리프 수집 및 outline decomposition
-6. 스크립트별 UPM 정규화, 확대, 중앙 정렬 및 클리핑 제한
-7. 각 branch에 한글·가나·한자 glyph, cmap 및 hmtx 병합
-8. NFD 한글용 `ccmp` 추가
+2. IBM Plex Mono variant별 Powerline intermediate 생성
+3. intermediate의 라틴 advance 600과 Powerline advance 600 검증
+4. 마루 부리와 IBM Plex Sans JP 글리프 수집 및 outline decomposition
+5. 스크립트별 UPM 정규화, 확대, 중앙 정렬 및 클리핑 제한
+6. 한글·가나·한자 glyph, cmap 및 hmtx 병합
+7. NFD 한글용 `ccmp` 추가
+8. `Emoji_Presentation=Yes` 코드포인트 매핑과 고아 글리프 제거
 9. style bit, RIBBI 이름, 수직 메트릭 및 Unicode range 갱신
 10. IBM Plex Sans JP 기반 TTF 저장
 11. 생성한 TTF를 다시 열어 구조 검증
@@ -330,6 +349,8 @@ CJK 병합 시 다음 테이블을 갱신해야 한다.
 13. 동일 specimen과 렌더러로 H0–H3 한글 optical correction 비교
 14. 확정한 correction으로 최종 산출물 재생성
 15. 라이선스와 manifest를 포함한 릴리스 패키지 생성
+
+Unicode range(`OS/2.ulUnicodeRange`)는 emoji 제거 이후의 실제 `cmap`으로 계산한다.
 
 제안하는 저장소 구조는 다음과 같다.
 
@@ -342,12 +363,14 @@ src/<package>/metrics.py
 src/<package>/naming.py
 src/<package>/japanese.py
 src/<package>/powerline.py
+src/<package>/emoji.py
 src/<package>/cli.py
 tests/test_metrics.py
 tests/test_merge.py
 tests/test_shaping.py
 tests/test_japanese.py
 tests/test_powerline.py
+tests/test_emoji.py
 specimens/
 licenses/
 upstream/          # gitignored
@@ -364,7 +387,10 @@ fonts/             # gitignored
 - 포함된 한글 자모의 advance가 정책과 일치한다.
 - 선택한 일본어 원본에서 복사한 가나와 한자의 advance가 1,200이다.
 - 일본어 원본의 실제 `cmap`과 결과 글꼴의 대상 일본어 `cmap` 사이에 의도하지 않은 누락이 없다.
-- Powerline 및 Powerline Extra 글리프의 advance가 600이다.
+- 모든 RIBBI face에 9.1의 Powerline 및 Powerline Extra 코드포인트가 모두 존재하고 advance가 600이다.
+- 최종 `cmap`의 모든 서브테이블과 고정한 `emoji-data.txt`의 `Emoji_Presentation=Yes` 집합의 교집합이 비어 있다.
+- emoji 제거로 고아가 된 글리프가 남아 있지 않다.
+- `U+2717`이 IBM Plex Mono `U+274C` 윤곽을 가리키고 advance가 600이다.
 - glyph order와 `glyf` 테이블에 누락 또는 중복이 없다.
 - 모든 glyph bounding box가 최종 수직 셀 안에 있다.
 - TTF를 fontTools로 저장한 뒤 다시 열 수 있다.
@@ -389,6 +415,7 @@ fonts/             # gitignored
 - IBM Plex Mono의 기존 라틴 shaping이 유지된다.
 - 일본어 proportional feature가 활성화돼 가나 또는 한자 advance가 달라지지 않는다.
 - Powerline PUA 코드포인트가 fallback 없이 현재 폰트에서 선택된다.
+- `❌`, `✅`, `⚡`, `👍` 같은 emoji presentation 문자는 OS emoji 글꼴로 fallback되고, `♥`, `★`, `☰`, `✓`, `✗` 같은 text presentation 기호는 현재 폰트에서 선택된다.
 
 ### 12.4 시각 검사
 
@@ -418,6 +445,7 @@ Il1| O0 0123456789 ()[]{} <> != == ->
 （）［］｛｝，．：；！？
       
      
+❌ ✅ ⚡ 👍 | ♥ ★ ☰ ✓ ✗
 ```
 
 Powerline 검수에서는 연속된 배경색 블록 사이에 1px 틈, 잘림 또는 italic 기울기 흔적이 없어야 한다.
@@ -477,13 +505,28 @@ Preview B에서도 Regular face의 마루 부리가 IBM Plex Mono Regular 및 IB
 - `validate_built_font`는 모든 한글 글리프가 수평 guard와 수직 셀 안에 있는지 검사한다. 배율, anchor, 이동량을 바꿀 때 이 검사가 첫 방어선이다. 비교 스크립트는 셀 초과를 결과로 기록해야 하므로 `check_hangul_cell=False`로 이 검사만 끈다.
 - 확대로 획 폭도 10% 커지지만 Regular 한글의 굵기 인상은 별도로 평가하지 않았다. 12.6의 H3(SemiBold 0.96)은 1.10 빌드를 실제 터미널에서 사용해 본 뒤 진행 여부를 결정한다. Bold는 Regular와 같은 1.10/y=300/+30을 사용한다.
 
+### 12.10 Powerline 기본 포함 및 emoji 제외 (2026-10-28)
+
+`PL` 패밀리를 폐지하고 Powerline Core/Extra를 `Gyeol Mono`에 기본으로 포함한다. 근거는 다음과 같다.
+
+- 추가 글리프가 약 40개로, preview B Regular의 26,076 glyph에 비해 크기 영향이 없다.
+- 9.1 범위가 기존 PUA 글리프(`U+F6D7`, `U+F6D8`)와 겹치지 않는다.
+- Box Drawing과 Block Elements(`U+2500–U+259F`) 160자를 이미 제공하므로, 셀 경계에 맞닿는 터미널 UI 글리프를 기본 패밀리가 담당하는 편이 일관된다.
+- 주 사용처가 터미널과 IDE이며 셀 정렬, 박스 글리프 보존 등 기존 결정도 터미널 기준이다.
+- 패밀리가 하나로 줄어 사용자가 PL과 기본 패밀리 중 무엇을 설치할지 고민할 필요가 없고 빌드 행렬과 배포 archive가 절반이 된다.
+
+2026-10-28에 배포 파일을 직접 확인한 결과, JetBrains Mono 2.304 Regular는 기본 패밀리에 Powerline Core 7자를 포함한다. Cascadia Code 2407.24는 기본 패밀리에는 Powerline이 없고 `PL`(38자)과 `NF`(41자) 변형에만 포함하며, Roboto Mono는 포함하지 않는다. Cascadia처럼 `PL` 이름을 분리하는 사례도 있지만, 이 프로젝트에는 기존 PUA 글리프와의 충돌이 없어 분리로 얻는 이점이 작다.
+
+같은 날 6.1의 emoji 제외 정책을 추가했다. 컬러 emoji는 플랫폼마다 포맷(COLR/CPAL, sbix, CBDT)이 다르고, 수록하면 글꼴 크기가 크게 늘어나며, ZWJ 시퀀스 셀 폭은 글꼴이 통제할 수 없어 OS fallback이 낫다고 판단했다. 전체 Nerd Fonts 아이콘은 eza 등에서 필요한 Material Design 세트가 대부분을 차지해 부분 세트의 이점이 작으므로, 넣는다면 별도 패밀리로 전체 세트를 제공하는 방안을 15장에서 결정한다.
+
 ## 13. 재현성과 배포
 
 - 빌드 도구와 Python 의존성 버전을 lockfile로 고정한다.
 - Nerd Fonts patcher와 glyph assets는 동일 tag 또는 commit에서 가져온다.
+- `emoji-data.txt`는 Unicode 버전을 명시한 URL과 SHA-256으로 `sources.toml`에 고정한다. Unicode 버전을 올릴 때는 제거 대상 변화를 릴리스 노트에 기록한다.
 - 빌드 시각에 따라 `head.modified`가 달라지지 않도록 재현 가능한 timestamp 정책을 사용한다.
 - 생성 폰트의 SHA-256을 릴리스 manifest에 기록한다.
-- 기본 패밀리는 `GyeolMono`, Powerline 패밀리는 `GyeolMonoPL` 디렉터리 및 별도 archive로 제공한다.
+- `GyeolMono` 디렉터리와 단일 archive로 제공한다.
 - 웹 배포 시 WOFF2와 명시적인 `@font-face` CSS를 제공한다.
 
 ## 14. 라이선스와 저작권 고지
@@ -493,7 +536,8 @@ Preview B에서도 Regular face의 마루 부리가 IBM Plex Mono Regular 및 IB
 - 마루 부리는 수정과 재배포가 허용되지만 네이버와 네이버문화재단의 저작권 안내 및 라이선스 전문을 포함해야 한다. 리디바탕(SIL OFL 1.1)을 담는 비교 패키지에만 리디주식회사 고지가 필요하다.
 - Klee One은 SIL Open Font License 1.1이며, 후보 비교 및 Klee 기반 결과물에는 원본 저작권 고지를 포함한다.
 - IBM Plex Sans JP는 SIL Open Font License 1.1이며, IBM Plex Mono와 동일하게 최종 family name에서 `Plex`를 사용하지 않는다.
-- Powerline 자산을 포함하는 `PL` 패밀리에는 Nerd Fonts 및 해당 glyph source의 라이선스 고지를 추가한다.
+- Powerline 자산을 기본 포함하므로 `Gyeol Mono` 배포물에 Nerd Fonts 및 해당 glyph source의 라이선스 고지를 추가한다.
+- `emoji-data.txt`는 빌드 입력으로만 사용하고 글꼴이나 배포물에 포함하지 않는다.
 - 결과 폰트에 IBM, 네이버 또는 원저작자가 최종 결과물을 보증한다는 표현을 사용하지 않는다.
 
 예상 라이선스 구조:
@@ -515,7 +559,8 @@ licenses/
 - Bold의 한글 확대율과 IBM Plex Sans JP의 웨이트별 optical scale
 - 스크립트·웨이트별 수평/수직 optical correction 값
 - 전각/반각 및 중복 기호 allowlist
-- 기본 패밀리와 `PL` 패밀리를 모두 배포할지 여부
+- 전체 Nerd Fonts 아이콘을 담은 별도 `Gyeol Mono NF` 패밀리 제공 여부. 제공한다면 IBM Plex Mono에 먼저 패치하는 9.2 순서와 6.1 emoji 제외를 그대로 적용하고, 아이콘 시각 폭 정책과 PUA의 East Asian Width(Ambiguous) 안내를 함께 정한다
+- 고정할 Nerd Fonts tag
 - 향후 JP/KR `locl` glyph form 지원 여부
 - 향후 synthetic CJK italic 실험 여부
 
@@ -528,14 +573,15 @@ licenses/
 - 리디바탕 시안을 철회하고 마루 부리를 한글 원본으로 재확정한다. 리디바탕은 비교 실험 기록으로만 유지한다.
 - 마루 부리 Regular의 굵기 보정은 H0–H3 후속 비교로 결정하며 정적 Regular/SemiBold outline의 직접 보간은 사용하지 않는다.
 - 한글 기본 배율은 1.10, 수직 anchor는 y=300, 수직 이동은 +30이며 Regular와 Bold에 같이 적용한다. 일본어 배율은 1.00이다.
-- 최종 family name은 `Gyeol Mono`, Powerline family name은 `Gyeol Mono PL`을 사용한다.
+- 최종 family name은 `Gyeol Mono` 하나이며 `PL` 패밀리는 만들지 않는다.
 - 한국어 표시 이름은 `결 모노`를 사용하되 OpenType family name과 PostScript name은 ASCII로 유지한다.
 - IBM Plex Mono true italic을 보존한다.
 - Italic variant에서도 모든 CJK 글리프와 Powerline은 upright로 유지한다.
 - 사용자 노출 웨이트는 Regular와 Bold 두 개로 제한하고 RIBBI 네 face를 제공한다.
 - Bold face는 세 스크립트의 SemiBold 600 outline을 사용하되 Bold 700 메타데이터로 노출한다. 한글 synthetic bold는 적용하지 않는다.
-- Powerline Core와 Extra만 포함하며 전체 Nerd Fonts 세트는 포함하지 않는다.
+- 기본 패밀리에 Powerline Core와 Extra를 포함하며 전체 Nerd Fonts 세트는 포함하지 않는다.
 - Powerline은 IBM Plex Mono에 먼저 패치한 뒤 한글을 병합한다.
 - `--mono` 대신 `--single-width-glyphs`를 사용한다.
-- `Gyeol Mono`와 `Gyeol Mono PL` 패밀리를 분리한다.
+- `Emoji_Presentation=Yes` 코드포인트는 원본과 무관하게 최종 글꼴에서 제외하고 OS emoji 글꼴 fallback에 맡긴다. text presentation 기호는 유지한다.
+- IBM Plex Mono의 `U+274C` 흑백 X 윤곽은 `U+2717`(✗)로 옮겨 ✓/✗ 짝을 유지한다.
 - 초기 출력은 TTF와 WOFF2로 제한한다.
